@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SteamBellries - Магазин сервера</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== ОБНУЛЕНИЕ И БАЗА ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #0a0815;
+            color: #e0d6f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== ШАПКА ===== */
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+            border-bottom: 2px solid #3a2a5a;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #f97316, #a855f7);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            animation: gradientMove 4s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1 .gear {
+            -webkit-text-fill-color: initial;
+            color: #f97316;
+            font-size: 44px;
+            display: inline-block;
+            animation: spin 6s linear infinite;
+            filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.4));
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #8b7aaa;
+            margin-top: 10px;
+        }
+
+        .header p strong {
+            color: #f97316;
+            -webkit-text-fill-color: #f97316;
+        }
+
+        /* ===== ГЛАВНЫЕ ВКЛАДКИ ===== */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 14px 40px;
+            background: #1a1030;
+            border: 2px solid #3a2a5a;
+            border-radius: 50px;
+            color: #8b7aaa;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            border-color: #a855f7;
+            color: #c8b0e8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border-color: #a855f7;
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+        }
+
+        /* ===== ПОДВКЛАДКИ ===== */
+        .sub-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab-btn {
+            padding: 10px 28px;
+            background: #120c22;
+            border: 2px solid #2a1a4a;
+            border-radius: 30px;
+            color: #6a5a8a;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .sub-tab-btn:hover {
+            border-color: #a855f7;
+            color: #b7a0d0;
+            transform: translateY(-2px);
+        }
+
+        .sub-tab-btn.active {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-color: #f97316;
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        /* ===== КОНТЕНТ ВКЛАДОК ===== */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== ЗАГОЛОВКИ СЕКЦИЙ ===== */
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #d4c0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title .badge {
+            font-size: 14px;
+            font-weight: 600;
+            background: #2a1a4a;
+            padding: 4px 14px;
+            border-radius: 20px;
+            color: #a080c0;
+        }
+
+        /* ===== СЕТКА КАРТОЧЕК ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* ===== КАРТОЧКА ===== */
+        .card {
+            background: #120c22;
+            border: 1px solid #2a1a4a;
+            border-radius: 16px;
+            padding: 20px 18px 18px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #a855f7, #f97316, #a855f7);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2), 0 0 60px rgba(168, 85, 247, 0.05);
+            border-color: #a855f766;
+        }
+
+        .card .icon {
+            font-size: 44px;
+            text-align: center;
+            margin-bottom: 10px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card .icon img {
+            max-width: 64px;
+            max-height: 64px;
+            object-fit: contain;
+        }
+
+        .card .name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e8d8f8;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .card .desc {
+            font-size: 13px;
+            color: #8b7aaa;
+            line-height: 1.5;
+            flex-grow: 1;
+            margin: 6px 0 12px;
+            text-align: center;
+        }
+
+        .card .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .card .price small {
+            font-size: 13px;
+            font-weight: 400;
+            color: #8b7aaa;
+        }
+
+        .card .author {
+            font-size: 13px;
+            color: #6a5a8a;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .card .author span {
+            color: #b7a0d0;
+            font-weight: 600;
+        }
+
+        .card .btn {
+            display: inline-block;
+            text-align: center;
+            padding: 10px 0;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5);
+            background: linear-gradient(135deg, #c084fc, #8b5cf6);
+        }
+
+        .card.service {
+            border-color: #3a2a5a;
+        }
+
+        .card.service .price {
+            color: #f97316;
+        }
+
+        /* ===== КОНТАКТЫ ===== */
+        .contacts {
+            background: #120c22;
+            border: 1px solid #2a1a4a;
+            border-radius: 16px;
+            padding: 30px 25px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .contacts h3 {
+            font-size: 22px;
+            color: #d4c0f0;
+            margin-bottom: 12px;
+        }
+
+        .contacts p {
+            color: #8b7aaa;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .contacts p strong {
+            color: #f97316;
+        }
+
+        .contacts .links {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .contacts .links a {
+            color: #b7a0d0;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border: 1px solid #3a2a5a;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .contacts .links a:hover {
+            border-color: #a855f7;
+            color: #c8b0e8;
+            background: rgba(168, 85, 247, 0.1);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+        }
+
+        /* ===== ПОДВАЛ ===== */
+        .footer {
+            text-align: center;
+            padding: 30px 0 10px;
+            color: #4a3a6a;
+            font-size: 13px;
+            border-top: 1px solid #1a1030;
+            margin-top: 40px;
+        }
+
+        /* ===== АДАПТАЦИЯ ===== */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 32px;
+            }
+            .header h1 .gear {
+                font-size: 30px;
+            }
+            .grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+            .card {
+                padding: 14px 12px;
+            }
+            .card .icon {
+                font-size: 32px;
+            }
+            .card .icon img {
+                max-width: 48px;
+                max-height: 48px;
+            }
+            .card .name {
+                font-size: 15px;
+            }
+            .card .price {
+                font-size: 17px;
+            }
+            .tab-btn {
+                padding: 10px 25px;
+                font-size: 15px;
+            }
+            .sub-tab-btn {
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+            .tabs {
+                gap: 10px;
+            }
+            .sub-tabs {
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
+            .sub-tab-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+                width: 100%;
+                text-align: center;
+            }
+            .tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sub-tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* ===== ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ===== */
+        .card .price {
+            text-shadow: 0 0 30px rgba(249, 115, 22, 0.15);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0815;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #c084fc, #8b5cf6);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== ШАПКА ===== -->
+        <header class="header">
+            <h1>
+                <span class="gear">⚙</span>
+                SteamBellries
+                <span class="gear">⚙</span>
+            </h1>
+            <p>Продажа предметов и услуг на сервере <strong>«Euphorium»</strong></p>
+        </header>
+
+        <!-- ===== ГЛАВНЫЕ ВКЛАДКИ ===== -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="items">Товары</button>
+            <button class="tab-btn" data-tab="services">Услуги</button>
+            <button class="tab-btn" data-tab="all">Всё сразу</button>
+        </div>
+
+        <!-- ===== ВКЛАДКА: ТОВАРЫ ===== -->
+        <div class="tab-content active" id="tab-items">
+            <h2 class="section-title">
+                Предметы
+                <span class="badge">в наличии</span>
+            </h2>
+
+            <!-- ПОДВКЛАДКИ -->
+            <div class="sub-tabs" id="subTabsItems">
+                <button class="sub-tab-btn active" data-sub="all">Все</button>
+                <button class="sub-tab-btn" data-sub="enchants">Зачарования</button>
+                <button class="sub-tab-btn" data-sub="resources">Ресурсы</button>
+                <button class="sub-tab-btn" data-sub="sets">Наборы</button>
+            </div>
+
+            <div class="grid" id="itemsGrid"></div>
+        </div>
+
+        <!-- ===== ВКЛАДКА: УСЛУГИ ===== -->
+        <div class="tab-content" id="tab-services">
+            <h2 class="section-title">
+                Услуги игроков
+                <span class="badge">закажи сейчас</span>
+            </h2>
+            <div class="grid" id="servicesGrid"></div>
+        </div>
+
+        <!-- ===== ВКЛАДКА: ВСЁ СРАЗУ ===== -->
+        <div class="tab-content" id="tab-all">
+            <h2 class="section-title">
+                Все предложения
+                <span class="badge">товары + услуги</span>
+            </h2>
+            <div class="grid" id="allGrid"></div>
+        </div>
+
+        <!-- ===== КОНТАКТЫ ===== -->
+        <div class="contacts">
+            <h3>Как сделать заказ?</h3>
+            <p>
+                Выбери товар или услугу и нажми <strong>«Заказать»</strong> — откроется чат с продавцом.
+                Обсуди цену и способ оплаты (внутриигровая валюта или перевод по СБП).
+                После оплаты предмет будет выдан на сервере!
+            </p>
+            <div class="links">
+                <a href="#">Telegram</a>
+                <a href="#">ВКонтакте</a>
+                <a href="#">Discord</a>
+            </div>
+        </div>
+
+        <!-- ===== ПОДВАЛ ===== -->
+        <div class="footer">
+            SteamBellries © 2026 · Сервер «Euphorium» · Не является платёжным агрегатором
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================
+        //  ТОВАРЫ
+        //  У КАРТОЧЕК В КАТЕГОРИИ "ЗАЧАРОВАНИЯ" ОПИСАНИЕ УБРАНО
+        // ============================================
+        const items = [{
+            // ЗАЧАРОВАНИЯ (без описания)
+            id: 1,
+            icon: '<img src="https://yapx.ru/album/d84i1" alt="Починка">',
+            name: 'Починка',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 2,
+            icon: '<img src="https://yapx.ru/album/d84vJ" alt="Эффективность V">',
+            name: 'Эффективность V',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 3,
+            icon: '<img src="https://yapx.ru/album/d84wN" alt="Удача III">',
+            name: 'Удача III',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 4,
+            icon: '<img src="https://yapx.ru/album/d84zN" alt="Шелковое касание">',
+            name: 'Шелковое касание',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 5,
+            icon: '<img src="sharpness_5.png" alt="Острота V">',
+            name: 'Острота V',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 6,
+            icon: '<img src="looting_3.png" alt="Добыча III">',
+            name: 'Добыча III',
+            desc: '',
+            price: '???',
+            category: 'enchants',
+            contact: 'https://t.me/your_nick'
+        }, {
+            // РЕСУРСЫ
+            id: 7,
+            icon: '💎',
+            name: 'Блок алмаза (64 шт.)',
+            desc: 'Сразу 64 блока алмаза для строительства',
+            price: '200 алмазов',
+            category: 'resources',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 8,
+            icon: '🪨',
+            name: 'Блок обсидиана (64 шт.)',
+            desc: '64 блока обсидиана для порталов и построек',
+            price: '80 алмазов',
+            category: 'resources',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 9,
+            icon: '🔮',
+            name: 'Незеритовый слиток (32 шт.)',
+            desc: '32 незеритовых слитка для крафта',
+            price: '250 алмазов',
+            category: 'resources',
+            contact: 'https://t.me/your_nick'
+        }, {
+            // НАБОРЫ
+            id: 10,
+            icon: '🧪',
+            name: 'Зелье скорости II (8 мин)',
+            desc: 'Зелье скорости + продление, 3 шт.',
+            price: '20 алмазов',
+            category: 'sets',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 11,
+            icon: '🍖',
+            name: 'Набор еды (64 шт.)',
+            desc: 'Золотые яблоки + стейки + хлеб',
+            price: '30 алмазов',
+            category: 'sets',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 12,
+            icon: '📦',
+            name: 'Сундук шалкера (цветной)',
+            desc: 'Любой цвет на выбор, 27 слотов',
+            price: '45 алмазов',
+            category: 'sets',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 13,
+            icon: '🪄',
+            name: 'Тотем бессмертия (3 шт.)',
+            desc: 'Три тотема, спасут от смерти 3 раза',
+            price: '90 алмазов',
+            category: 'sets',
+            contact: 'https://t.me/your_nick'
+        }];
+
+        // ============================================
+        //  УСЛУГИ
+        // ============================================
+        const services = [{
+            id: 101,
+            icon: '🏗',
+            name: 'Постройка дома',
+            desc: 'Построю дом любой сложности по вашему проекту или готовому шаблону',
+            price: 'от 200 алмазов',
+            author: 'Игрок: Builder_Pro',
+            contact: 'https://t.me/builder_pro'
+        }, {
+            id: 102,
+            icon: '⚡',
+            name: 'Прокладка рельсов',
+            desc: 'Проложу дорогу из рельсов с редстоун-схемой, длина до 500 блоков',
+            price: '100 алмазов',
+            author: 'Игрок: RailMaster',
+            contact: 'https://t.me/railmaster'
+        }, {
+            id: 103,
+            icon: '🧙',
+            name: 'Зачарование вещей',
+            desc: 'Наложу нужные чары на любой предмет (книги приношу я)',
+            price: 'от 15 алмазов',
+            author: 'Игрок: Enchanter_X',
+            contact: 'https://t.me/enchanter_x'
+        }, {
+            id: 104,
+            icon: '🚜',
+            name: 'Ферма под ключ',
+            desc: 'Построю автоматическую ферму пшеницы/моркови/картофеля',
+            price: '250 алмазов',
+            author: 'Игрок: FarmKing',
+            contact: 'https://t.me/farmking'
+        }, {
+            id: 105,
+            icon: '🎨',
+            name: 'Дизайн интерьера',
+            desc: 'Оформлю интерьер вашего дома в любом стиле',
+            price: 'от 150 алмазов',
+            author: 'Игрок: Interior_Pro',
+            contact: 'https://t.me/interior_pro'
+        }, {
+            id: 106,
+            icon: '🗺',
+            name: 'Исследователь мира',
+            desc: 'Найду любую структуру: храм, крепость, город, бастион',
+            price: '80 алмазов',
+            author: 'Игрок: Explorer_X',
+            contact: 'https://t.me/explorer_x'
+        }];
+
+        // ============================================
+        //  ФУНКЦИЯ ДЛЯ ОТРИСОВКИ КАРТОЧЕК
+        // ============================================
+        function renderCards(data, containerId, isService = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                        <div style="text-align:center;padding:40px;color:#6a5a8a;grid-column:1/-1;">
+                            В этой категории пока ничего нет
+                        </div>
+                    `;
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card' + (isService ? ' service' : '');
+
+                // Показываем описание, только если оно не пустое
+                const descHtml = item.desc ? `<div class="desc">${item.desc}</div>` : '';
+
+                card.innerHTML = `
+                        <div class="icon">${item.icon}</div>
+                        <div class="name">${item.name}</div>
+                        ${item.author ? `<div class="author">${item.author}</div>` : ''}
+                        ${descHtml}
+                        <div class="price">${item.price} <small>${isService ? 'за услугу' : 'за шт.'}</small></div>
+                        <a href="${item.contact}" target="_blank" class="btn">Заказать</a>
+                    `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // ============================================
+        //  ФИЛЬТРАЦИЯ ТОВАРОВ ПО КАТЕГОРИИ
+        // ============================================
+        function filterItems(category) {
+            let filtered;
+            if (category === 'all') {
+                filtered = items;
+            } else {
+                filtered = items.filter(item => item.category === category);
+            }
+            renderCards(filtered, 'itemsGrid');
+        }
+
+        // ============================================
+        //  ВКЛАДКИ (ГЛАВНЫЕ)
+        // ============================================
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = {
+            items: document.getElementById('tab-items'),
+            services: document.getElementById('tab-services'),
+            all: document.getElementById('tab-all')
+        };
+
+        const allItems = [...items, ...services.map(s => ({ ...s, isService: true }))];
+
+        // Отрисовка при загрузке
+        filterItems('all');
+        renderCards(services, 'servicesGrid', true);
+        renderCards(allItems, 'allGrid');
+
+        // Обработка главных вкладок
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                Object.values(tabContents).forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                const tabName = this.dataset.tab;
+                if (tabName === 'items') {
+                    tabContents.items.classList.add('active');
+                    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('.sub-tab-btn[data-sub="all"]').classList.add('active');
+                    filterItems('all');
+                } else if (tabName === 'services') {
+                    tabContents.services.classList.add('active');
+                } else if (tabName === 'all') {
+                    tabContents.all.classList.add('active');
+                }
+            });
+        });
+
+        // ============================================
+        //  ПОДВКЛАДКИ (ДЛЯ ТОВАРОВ)
+        // ============================================
+        const subTabButtons = document.querySelectorAll('.sub-tab-btn');
+
+        subTabButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                subTabButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const category = this.dataset.sub;
+                filterItems(category);
+            });
+        });
+
+        console.log('Сайт обновлён! В категории "Зачарования" убраны описания и добавлены новые карточки.');
+    </script>
+
+</body>
+</html>

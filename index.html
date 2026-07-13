@@ -221,6 +221,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
+            align-items: center; /* Центрируем содержимое */
             position: relative;
             overflow: hidden;
         }
@@ -249,28 +250,37 @@
             border-color: #a855f766;
         }
 
-        .card .icon {
-            font-size: 44px;
-            text-align: center;
-            margin-bottom: 10px;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card .icon img {
-            max-width: 64px;
-            max-height: 64px;
-            object-fit: contain;
-        }
-
+        /* --- НАЗВАНИЕ (теперь сверху) --- */
         .card .name {
             font-size: 18px;
             font-weight: 700;
             color: #e8d8f8;
-            margin-bottom: 4px;
+            margin-bottom: 15px; /* Отступ до иконки */
             text-align: center;
+            order: 1; /* Явно ставим на первое место */
+            width: 100%;
+        }
+
+        /* --- ИКОНКА (теперь по центру и снизу) --- */
+        .card .icon {
+            font-size: 44px;
+            text-align: center;
+            margin-bottom: 15px; /* Отступ до цены */
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            order: 2; /* Ставим после названия */
+            width: 100%;
+        }
+
+        /* --- УВЕЛИЧЕННЫЕ КАРТИНКИ В 5 РАЗ --- */
+        .card .icon img {
+            max-width: 240px;  /* Было 48px * 5 = 240px */
+            max-height: 240px; /* Было 48px * 5 = 240px */
+            width: auto;
+            height: auto;
+            object-fit: contain;
         }
 
         .card .desc {
@@ -280,6 +290,8 @@
             flex-grow: 1;
             margin: 6px 0 12px;
             text-align: center;
+            order: 3;
+            width: 100%;
         }
 
         .card .price {
@@ -288,6 +300,8 @@
             color: #f97316;
             margin-bottom: 14px;
             text-align: center;
+            order: 4;
+            width: 100%;
         }
 
         .card .price small {
@@ -302,6 +316,8 @@
             margin-top: 4px;
             margin-bottom: 10px;
             text-align: center;
+            order: 5;
+            width: 100%;
         }
 
         .card .author span {
@@ -324,6 +340,8 @@
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            order: 6; /* Кнопка в самом низу */
+            width: 100%;
         }
 
         .card .btn:hover {
@@ -420,9 +438,10 @@
             .card .icon {
                 font-size: 32px;
             }
+            /* Уменьшаем картинки на телефонах, чтобы они не вылезали */
             .card .icon img {
-                max-width: 48px;
-                max-height: 48px;
+                max-width: 120px;
+                max-height: 120px;
             }
             .card .name {
                 font-size: 15px;
@@ -449,6 +468,11 @@
         @media (max-width: 420px) {
             .grid {
                 grid-template-columns: 1fr;
+            }
+            /* Ещё уменьшаем на маленьких экранах */
+            .card .icon img {
+                max-width: 150px;
+                max-height: 150px;
             }
             .tab-btn {
                 padding: 10px 20px;
@@ -577,12 +601,12 @@
     <script>
         // ============================================
         //  ТОВАРЫ
-        //  У КАРТОЧЕК В КАТЕГОРИИ "ЗАЧАРОВАНИЯ" ОПИСАНИЕ УБРАНО
+        //  ИКОНКИ ЗАМЕНЕНЫ НА ЛОКАЛЬНЫЕ ФАЙЛЫ
         // ============================================
         const items = [{
             // ЗАЧАРОВАНИЯ (без описания)
             id: 1,
-            icon: '<img src="https://yapx.ru/album/d84i1" alt="Починка">',
+            icon: '<img src="mending_1.png" alt="Починка">',
             name: 'Починка',
             desc: '',
             price: '???',
@@ -590,7 +614,7 @@
             contact: 'https://t.me/your_nick'
         }, {
             id: 2,
-            icon: '<img src="https://yapx.ru/album/d84vJ" alt="Эффективность V">',
+            icon: '<img src="efficiency_5.png" alt="Эффективность V">',
             name: 'Эффективность V',
             desc: '',
             price: '???',
@@ -598,7 +622,7 @@
             contact: 'https://t.me/your_nick'
         }, {
             id: 3,
-            icon: '<img src="https://yapx.ru/album/d84wN" alt="Удача III">',
+            icon: '<img src="fortune_3.png" alt="Удача III">',
             name: 'Удача III',
             desc: '',
             price: '???',
@@ -606,7 +630,7 @@
             contact: 'https://t.me/your_nick'
         }, {
             id: 4,
-            icon: '<img src="https://yapx.ru/album/d84zN" alt="Шелковое касание">',
+            icon: '<img src="silk_touch_1.png" alt="Шелковое касание">',
             name: 'Шелковое касание',
             desc: '',
             price: '???',
@@ -767,8 +791,8 @@
                 const descHtml = item.desc ? `<div class="desc">${item.desc}</div>` : '';
 
                 card.innerHTML = `
-                        <div class="icon">${item.icon}</div>
                         <div class="name">${item.name}</div>
+                        <div class="icon">${item.icon}</div>
                         ${item.author ? `<div class="author">${item.author}</div>` : ''}
                         ${descHtml}
                         <div class="price">${item.price} <small>${isService ? 'за услугу' : 'за шт.'}</small></div>
@@ -848,7 +872,7 @@
             });
         });
 
-        console.log('Сайт обновлён! В категории "Зачарования" убраны описания и добавлены новые карточки.');
+        console.log('Сайт обновлён! Иконки заменены, увеличены и перенесены под название.');
     </script>
 
 </body>

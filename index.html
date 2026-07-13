@@ -221,7 +221,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Центрируем содержимое */
+            align-items: center;
             position: relative;
             overflow: hidden;
         }
@@ -250,34 +250,31 @@
             border-color: #a855f766;
         }
 
-        /* --- НАЗВАНИЕ (теперь сверху) --- */
         .card .name {
             font-size: 18px;
             font-weight: 700;
             color: #e8d8f8;
-            margin-bottom: 15px; /* Отступ до иконки */
+            margin-bottom: 15px;
             text-align: center;
-            order: 1; /* Явно ставим на первое место */
+            order: 1;
             width: 100%;
         }
 
-        /* --- ИКОНКА (теперь по центру и снизу) --- */
         .card .icon {
             font-size: 44px;
             text-align: center;
-            margin-bottom: 15px; /* Отступ до цены */
+            margin-bottom: 15px;
             min-height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            order: 2; /* Ставим после названия */
+            order: 2;
             width: 100%;
         }
 
-        /* --- УВЕЛИЧЕННЫЕ КАРТИНКИ В 5 РАЗ --- */
         .card .icon img {
-            max-width: 240px;  /* Было 48px * 5 = 240px */
-            max-height: 240px; /* Было 48px * 5 = 240px */
+            max-width: 240px;
+            max-height: 240px;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -320,11 +317,6 @@
             width: 100%;
         }
 
-        .card .author span {
-            color: #b7a0d0;
-            font-weight: 600;
-        }
-
         .card .btn {
             display: inline-block;
             text-align: center;
@@ -340,7 +332,7 @@
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
-            order: 6; /* Кнопка в самом низу */
+            order: 6;
             width: 100%;
         }
 
@@ -438,7 +430,6 @@
             .card .icon {
                 font-size: 32px;
             }
-            /* Уменьшаем картинки на телефонах, чтобы они не вылезали */
             .card .icon img {
                 max-width: 120px;
                 max-height: 120px;
@@ -469,7 +460,6 @@
             .grid {
                 grid-template-columns: 1fr;
             }
-            /* Ещё уменьшаем на маленьких экранах */
             .card .icon img {
                 max-width: 150px;
                 max-height: 150px;
@@ -601,10 +591,10 @@
     <script>
         // ============================================
         //  ТОВАРЫ
-        //  ИКОНКИ ЗАМЕНЕНЫ НА ЛОКАЛЬНЫЕ ФАЙЛЫ
+        //  В КАТЕГОРИИ "РЕСУРСЫ" ТОЛЬКО НОВЫЕ КАРТОЧКИ
         // ============================================
         const items = [{
-            // ЗАЧАРОВАНИЯ (без описания)
+            // ---------- ЗАЧАРОВАНИЯ (без описания) ----------
             id: 1,
             icon: '<img src="mending_1.png" alt="Починка">',
             name: 'Починка',
@@ -652,34 +642,54 @@
             price: '???',
             category: 'enchants',
             contact: 'https://t.me/your_nick'
-        }, {
-            // РЕСУРСЫ
+        },
+
+        // ---------- РЕСУРСЫ (НОВЫЕ, БЕЗ ОПИСАНИЯ) ----------
+        {
             id: 7,
-            icon: '💎',
-            name: 'Блок алмаза (64 шт.)',
-            desc: 'Сразу 64 блока алмаза для строительства',
-            price: '200 алмазов',
+            icon: '<img src="totem.png" alt="Тотем">',
+            name: 'Тотем 1шт',
+            desc: '',
+            price: '???',
             category: 'resources',
             contact: 'https://t.me/your_nick'
         }, {
             id: 8,
-            icon: '🪨',
-            name: 'Блок обсидиана (64 шт.)',
-            desc: '64 блока обсидиана для порталов и построек',
-            price: '80 алмазов',
+            icon: '<img src="White_wool.png" alt="Шерсть">',
+            name: 'Шерсть 64',
+            desc: '',
+            price: '???',
             category: 'resources',
             contact: 'https://t.me/your_nick'
         }, {
             id: 9,
-            icon: '🔮',
-            name: 'Незеритовый слиток (32 шт.)',
-            desc: '32 незеритовых слитка для крафта',
-            price: '250 алмазов',
+            icon: '<img src="bone.png" alt="Кости">',
+            name: 'Кости 64',
+            desc: '',
+            price: '???',
             category: 'resources',
             contact: 'https://t.me/your_nick'
         }, {
-            // НАБОРЫ
             id: 10,
+            icon: '<img src="gune.png" alt="Порох">',
+            name: 'Порох 64',
+            desc: '',
+            price: '???',
+            category: 'resources',
+            contact: 'https://t.me/your_nick'
+        }, {
+            id: 11,
+            icon: '<img src="pie.png" alt="Осетинский пирог">',
+            name: 'Осетинский пирог 64',
+            desc: '',
+            price: '???',
+            category: 'resources',
+            contact: 'https://t.me/your_nick'
+        },
+
+        // ---------- НАБОРЫ ----------
+        {
+            id: 12,
             icon: '🧪',
             name: 'Зелье скорости II (8 мин)',
             desc: 'Зелье скорости + продление, 3 шт.',
@@ -687,7 +697,7 @@
             category: 'sets',
             contact: 'https://t.me/your_nick'
         }, {
-            id: 11,
+            id: 13,
             icon: '🍖',
             name: 'Набор еды (64 шт.)',
             desc: 'Золотые яблоки + стейки + хлеб',
@@ -695,7 +705,7 @@
             category: 'sets',
             contact: 'https://t.me/your_nick'
         }, {
-            id: 12,
+            id: 14,
             icon: '📦',
             name: 'Сундук шалкера (цветной)',
             desc: 'Любой цвет на выбор, 27 слотов',
@@ -703,7 +713,7 @@
             category: 'sets',
             contact: 'https://t.me/your_nick'
         }, {
-            id: 13,
+            id: 15,
             icon: '🪄',
             name: 'Тотем бессмертия (3 шт.)',
             desc: 'Три тотема, спасут от смерти 3 раза',
@@ -787,7 +797,6 @@
                 const card = document.createElement('div');
                 card.className = 'card' + (isService ? ' service' : '');
 
-                // Показываем описание, только если оно не пустое
                 const descHtml = item.desc ? `<div class="desc">${item.desc}</div>` : '';
 
                 card.innerHTML = `
@@ -872,7 +881,7 @@
             });
         });
 
-        console.log('Сайт обновлён! Иконки заменены, увеличены и перенесены под название.');
+        console.log('Сайт обновлён! В категории "Ресурсы" новые товары.');
     </script>
 
 </body>

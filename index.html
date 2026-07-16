@@ -1098,7 +1098,7 @@
                     </div>
                 </div>
 
-                <!-- ПОДДЕРЖКА (Kutonea + al0nea) -->
+                <!-- ПОДДЕРЖКА -->
                 <div class="page-content" id="page-support">
                     <div class="support-block">
                         <h2>Поддержка</h2>
@@ -1674,9 +1674,7 @@
                         renderCart();
                     }
                     closeModal();
-                    if (currentContact) {
-                        window.open(currentContact, '_blank');
-                    }
+                    // Убрана ссылка на Telegram
                 } else {
                     alert('❌ Ошибка отправки. Попробуйте ещё раз.');
                 }

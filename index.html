@@ -268,38 +268,60 @@
             border: 1px solid #2a4a2a;
             border-radius: 16px;
             padding: 30px 35px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
         }
 
-        .support-block .support-info {
+        .support-block h2 {
+            font-size: 22px;
+            color: #8bc34a;
+            margin-bottom: 16px;
+        }
+
+        .support-block p {
+            color: #a8b8a8;
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .support-block .admin-info {
             display: flex;
             align-items: center;
             gap: 20px;
+            margin-top: 16px;
+            padding: 20px;
+            background: #162216;
+            border-radius: 12px;
+            border: 1px solid #2a4a2a;
         }
 
-        .support-block .support-info img {
-            width: 80px;
-            height: 80px;
+        .support-block .admin-info img {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             border: 3px solid #8bc34a;
             object-fit: cover;
         }
 
-        .support-block .support-info .name {
-            font-size: 28px;
-            font-weight: 700;
-            color: #8bc34a;
-            letter-spacing: 1px;
+        .support-block .admin-info .admin-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .support-block .support-info .label {
+        .support-block .admin-info .admin-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #8bc34a;
+        }
+
+        .support-block .admin-info .admin-contact {
             font-size: 14px;
-            color: #4a6a4a;
-            margin-top: 4px;
+            color: #8a9a8a;
+        }
+
+        .support-block .admin-info .admin-contact span {
+            color: #c8e0c8;
+            font-weight: 600;
         }
 
         /* ===== ТОВАРЫ ===== */
@@ -958,12 +980,9 @@
             .cart-header {
                 justify-content: center;
             }
-            .support-block .support-info img {
-                width: 60px;
-                height: 60px;
-            }
-            .support-block .support-info .name {
-                font-size: 22px;
+            .support-block .admin-info {
+                flex-direction: column;
+                text-align: center;
             }
             .card .btn-group {
                 flex-direction: column;
@@ -987,17 +1006,6 @@
             }
             .nav-menu .nav-link {
                 font-size: 14px;
-            }
-            .support-block .support-info {
-                flex-direction: column;
-                text-align: center;
-            }
-            .support-block .support-info img {
-                width: 80px;
-                height: 80px;
-            }
-            .support-block .support-info .name {
-                font-size: 24px;
             }
             .modal {
                 padding: 20px 15px;
@@ -1078,28 +1086,34 @@
                     </div>
                 </div>
 
-                <!-- НОВОСТИ -->
+                <!-- НОВОСТИ (дата исправлена) -->
                 <div class="page-content" id="page-news">
                     <div class="news-block">
                         <h2>Новости сервера</h2>
                         <div class="news-item">
-                            <div class="news-date">16 июля 2026</div>
+                            <div class="news-date">17 июля 2026</div>
                             <div class="news-title">Запуск бета-теста сайта</div>
                             <div class="news-text">Мы рады объявить о начале бета-тестирования нашего сайта! Теперь вы можете тестировать функционал магазина, оформлять заказы и оставлять свои отзывы. Все найденные баги и предложения принимаются через раздел поддержки. Спасибо, что помогаете нам стать лучше!</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ПОДДЕРЖКА -->
+                <!-- ПОДДЕРЖКА (обновлена) -->
                 <div class="page-content" id="page-support">
                     <div class="support-block">
-                        <div class="support-info">
+                        <h2>Поддержка</h2>
+                        <p>При возникновении вопросов или ошибок обращайтесь к администрации.</p>
+                        <div class="admin-info">
                             <img src="avatarHead3.png" alt="al0nea">
-                            <div>
-                                <div class="name">al0nea</div>
-                                <div class="label">Администратор</div>
+                            <div class="admin-details">
+                                <div class="admin-name">al0nea</div>
+                                <div class="admin-contact">Discord: <span>al0nea</span></div>
                             </div>
                         </div>
+                        <p style="margin-top:12px; color:#4a6a4a; font-size:14px;">
+                            📧 Email: support@euphorium.ru<br />
+                            ⏱ Время работы: ежедневно с 10:00 до 22:00 (МСК)
+                        </p>
                     </div>
                 </div>
 

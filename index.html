@@ -2321,6 +2321,7 @@ function addAdminById() {
         return;
     }
 
+    // ★★★ УБРАЛИ ПРОВЕРКУ НА СВОЙ ID ★★★
     if (ADMIN_IDS.includes(id)) {
         alert('Этот ID уже в списке администраторов!');
         return;

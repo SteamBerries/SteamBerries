@@ -6,7 +6,7 @@
     <title>Нюхач - Магазин сервера</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <style>
-        /* ===== ВСЕ СТИЛИ ОСТАЮТСЯ ТАКИМИ ЖЕ ===== */
+        /* ===== ВСЕ СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1305,6 +1305,19 @@
             color: #4a6a4a;
             font-size: 12px;
         }
+
+        /* Скрываем список админов от посторонних */
+        #adminListContainer .admin-item .details {
+            font-size: 10px;
+            color: #3a4a3a;
+        }
+        #adminListContainer .admin-item .name {
+            font-size: 14px;
+        }
+        /* Делаем список менее заметным */
+        #adminListContainer {
+            opacity: 0.85;
+        }
     </style>
 </head>
 <body>
@@ -1438,9 +1451,10 @@
                                     <div class="admin-list-header">Управление администраторами</div>
                                     <div class="admin-add-section">
                                         <input type="text" id="addAdminByIdInput" placeholder="Fingerprint ID" style="flex:1;min-width:200px;padding:8px 12px;background:#1a2a1a;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                        <button onclick="addAdminById(document.getElementById('addAdminByIdInput').value);document.getElementById('addAdminByIdInput').value='';" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
+                                        <button onclick="addAdminById()" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
                                     </div>
                                     <div id="adminListContainer" class="admin-list-container"></div>
+                                    <div style="margin-top:8px;color:#3a4a3a;font-size:11px;">Доступ только для администраторов</div>
                                 </div>
                             </div>
 
@@ -2226,34 +2240,58 @@
         // ============================================
 
         // ★★★ СПИСОК АДМИНОВ ПО ID ★★★
-        // Добавь сюда свои ID
-        const ADMIN_IDS = [
-            'fp_p1ktud_ufmt',    // ← ТВОЙ ID
-            'fp_p1ktud_1oec'     // ← ДРУГОЙ ID
-        ];
+        let ADMIN_IDS = [];
 
-        // Проверка доступа по ID
+        // Загрузка из localStorage
+        function loadAdminIds() {
+            const stored = localStorage.getItem('adminIds');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        ADMIN_IDS = parsed;
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Ошибка загрузки списка админов');
+                }
+            }
+            // Если списка нет — создаём с твоим ID
+            ADMIN_IDS = ['fp_p1ktud_ufmt', 'fp_p1ktud_1oec'];
+            saveAdminIds();
+        }
+
+        function saveAdminIds() {
+            localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
+        }
+
         function isUserAdmin() {
             return ADMIN_IDS.includes(userId);
         }
 
-        // Добавление ID в список (вручную через консоль)
-        function addAdminId(id) {
-            if (!id || id.trim() === '') {
-                alert('Введите ID!');
+        // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА (ИСПРАВЛЕНА) ★★★
+        function addAdminById() {
+            const input = document.getElementById('addAdminByIdInput');
+            if (!input) return;
+            const id = input.value.trim();
+            
+            if (!id) {
+                alert('Введите ID пользователя!');
                 return;
             }
-            if (ADMIN_IDS.includes(id.trim())) {
-                alert('Этот ID уже в списке!');
+            
+            if (ADMIN_IDS.includes(id)) {
+                alert('Этот ID уже в списке администраторов!');
                 return;
             }
-            ADMIN_IDS.push(id.trim());
-            localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
+            
+            ADMIN_IDS.push(id);
+            saveAdminIds();
             renderAdminList();
+            input.value = '';
             alert('ID добавлен в список администраторов!');
         }
 
-        // Удаление ID из списка
         function removeAdminId(id) {
             const index = ADMIN_IDS.indexOf(id);
             if (index === -1) {
@@ -2264,32 +2302,11 @@
                 if (!confirm('Вы удаляете СЕБЯ из списка администраторов! Продолжить?')) return;
             }
             ADMIN_IDS.splice(index, 1);
-            localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
+            saveAdminIds();
             renderAdminList();
             alert('ID удалён из списка администраторов!');
         }
 
-        // Загрузка списка из localStorage
-        function loadAdminIds() {
-            const stored = localStorage.getItem('adminIds');
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    // Очищаем массив и добавляем сохранённые ID
-                    ADMIN_IDS.length = 0;
-                    parsed.forEach(id => ADMIN_IDS.push(id));
-                } catch (e) {
-                    console.log('Ошибка загрузки списка админов');
-                }
-            }
-        }
-
-        // Сохранение списка в localStorage
-        function saveAdminIds() {
-            localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
-        }
-
-        // Отображение списка администраторов
         function renderAdminList() {
             const container = document.getElementById('adminListContainer');
             if (!container) return;
@@ -2302,7 +2319,6 @@
             let html = '';
             ADMIN_IDS.forEach((id, index) => {
                 const isCurrentUser = id === userId;
-                // Ищем ник в логе
                 const user = userLog.find(u => u.id === id);
                 const displayName = user ? (user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним')) : id.slice(0, 20) + '...';
 
@@ -2319,15 +2335,6 @@
                 `;
             });
             container.innerHTML = html;
-        }
-
-        // Добавление ID из админ-панели
-        function addAdminFromInput() {
-            const input = document.getElementById('addAdminByIdInput');
-            if (!input) return;
-            const id = input.value.trim();
-            addAdminId(id);
-            input.value = '';
         }
 
         // ============================================
@@ -2375,9 +2382,10 @@
                                 <div class="admin-list-header">Управление администраторами</div>
                                 <div class="admin-add-section">
                                     <input type="text" id="addAdminByIdInput" placeholder="Fingerprint ID" style="flex:1;min-width:200px;padding:8px 12px;background:#1a2a1a;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <button onclick="addAdminFromInput()" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
+                                    <button onclick="addAdminById()" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
                                 </div>
                                 <div id="adminListContainer" class="admin-list-container"></div>
+                                <div style="margin-top:8px;color:#3a4a3a;font-size:11px;">Доступ только для администраторов</div>
                             </div>
                         </div>
 

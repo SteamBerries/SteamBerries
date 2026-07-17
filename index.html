@@ -1952,13 +1952,7 @@
         const userId = getUserId();
 
        let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
-// Добавляем нового в конец
-bannedUsers.push({
-    id: 'fp_dkdxdz_tauw',
-    nick: 'Нарушитель',
-    reason: 'Нарушение правил',
-    timestamp: new Date().toISOString()
-});
+
 // Сохраняем
 localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
         function saveBannedUsers() {

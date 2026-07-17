@@ -2223,7 +2223,7 @@
         }
 
 // ============================================
-//  СИСТЕМА АДМИНИСТРАТОРОВ
+//  СИСТЕМА АДМИНИСТРАТОРОВ (С СОХРАНЕНИЕМ)
 // ============================================
 
 let ADMIN_IDS = [];
@@ -2231,13 +2231,13 @@ let ADMIN_IDS = [];
 // ★★★ ТВОЙ ID (для автодобавления) ★★★
 const MY_ID = 'fp_p1ktud_ufmt';
 
-// Загрузка списка админов
+// Загрузка списка админов из localStorage
 function loadAdminIds() {
     const stored = localStorage.getItem('adminIds');
     if (stored) {
         try {
             const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed) && parsed.length > 0) {
                 ADMIN_IDS = parsed.map(id => id.trim());
                 console.log('📋 Загружен список админов:', ADMIN_IDS);
                 return;
@@ -2246,14 +2246,37 @@ function loadAdminIds() {
             console.log('Ошибка загрузки списка админов');
         }
     }
-    // Если списка нет — создаём с твоим ID
+    // Если списка нет или он пустой — создаём с твоим ID
     ADMIN_IDS = [MY_ID];
     saveAdminIds();
     console.log('📋 Создан список с твоим ID:', ADMIN_IDS);
 }
 
+// Сохранение списка в localStorage
 function saveAdminIds() {
     localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
+    // Дублируем в sessionStorage для надёжности
+    try {
+        sessionStorage.setItem('adminIds_backup', JSON.stringify(ADMIN_IDS));
+    } catch(e) {}
+    console.log('💾 Список админов сохранён:', ADMIN_IDS);
+}
+
+// Восстановление из резервной копии (если основной список потерялся)
+function restoreAdminIds() {
+    try {
+        const backup = sessionStorage.getItem('adminIds_backup');
+        if (backup) {
+            const parsed = JSON.parse(backup);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                ADMIN_IDS = parsed.map(id => id.trim());
+                saveAdminIds();
+                console.log('🔄 Восстановлен список из резервной копии:', ADMIN_IDS);
+                return true;
+            }
+        }
+    } catch(e) {}
+    return false;
 }
 
 function isUserAdmin() {
@@ -2310,7 +2333,6 @@ function renderAdminList() {
     container.innerHTML = html;
 }
 
-// ★★★ ТЕПЕРЬ МОЖНО ДОБАВЛЯТЬ ЛЮБОЙ ID ★★★
 function addAdminById() {
     const input = document.getElementById('addAdminByIdInput');
     if (!input) return;
@@ -2321,7 +2343,6 @@ function addAdminById() {
         return;
     }
 
-    // ★★★ УБРАЛИ ПРОВЕРКУ НА СВОЙ ID ★★★
     if (ADMIN_IDS.includes(id)) {
         alert('Этот ID уже в списке администраторов!');
         return;
@@ -2332,6 +2353,9 @@ function addAdminById() {
     renderAdminList();
     input.value = '';
     alert('✅ ID добавлен в список администраторов!');
+    
+    // Проверяем, что сохранилось
+    console.log('📋 Проверка сохранения:', JSON.parse(localStorage.getItem('adminIds')));
 }
 
 function removeAdminId(id) {
@@ -2348,6 +2372,24 @@ function removeAdminId(id) {
     renderAdminList();
     alert('ID удалён из списка администраторов!');
 }
+
+// При загрузке страницы пробуем восстановить список
+function initAdminSystem() {
+    loadAdminIds();
+    // Если список пустой — пробуем восстановить из резервной копии
+    if (ADMIN_IDS.length === 0) {
+        restoreAdminIds();
+    }
+    // Если всё равно пустой — создаём с твоим ID
+    if (ADMIN_IDS.length === 0) {
+        ADMIN_IDS = [MY_ID];
+        saveAdminIds();
+    }
+    renderAdminList();
+}
+
+// ★★★ ВЫЗЫВАЕМ ЭТУ ФУНКЦИЮ ПРИ ЗАГРУЗКЕ ★★★
+// Вместо loadAdminIds() теперь используем initAdminSystem()
         // ============================================
         //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ (СНАЧАЛА ПАРОЛЬ, ПОТОМ ID)
         // ============================================
@@ -2680,7 +2722,7 @@ function removeAdminId(id) {
         //  ЗАГРУЗКА
         // ============================================
         // ★★★ СНАЧАЛА ЗАГРУЖАЕМ СПИСОК АДМИНОВ ★★★
-        loadAdminIds();
+        initAdminSystem();
 
         filterItems('all');
         updateCartUI();

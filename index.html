@@ -2222,44 +2222,46 @@
             }
         }
 
-        // ============================================
-        //  СИСТЕМА АДМИНИСТРАТОРОВ (ТОЛЬКО ПО ID)
-        // ============================================
+// ============================================
+//  СИСТЕМА АДМИНИСТРАТОРОВ (ТОЛЬКО ПО ID)
+// ============================================
 
-        // ★★★ СПИСОК АДМИНОВ ПО ID ★★★
-        let ADMIN_IDS = [];
+// ★★★ СПИСОК АДМИНОВ ПО ID ★★★
+let ADMIN_IDS = [];
 
-        // Загрузка из localStorage (вызывается ПЕРВОЙ при загрузке)
-        function loadAdminIds() {
-            const stored = localStorage.getItem('adminIds');
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed)) {
-                        ADMIN_IDS = parsed;
-                        console.log('📋 Загружен список админов:', ADMIN_IDS);
-                        return;
-                    }
-                } catch (e) {
-                    console.log('Ошибка загрузки списка админов');
-                }
+// Загрузка из localStorage
+function loadAdminIds() {
+    const stored = localStorage.getItem('adminIds');
+    if (stored) {
+        try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+                // Очищаем каждый ID от пробелов
+                ADMIN_IDS = parsed.map(id => id.trim());
+                console.log('📋 Загружен список админов:', ADMIN_IDS);
+                return;
             }
-            // Если списка нет — создаём с твоим ID
-            ADMIN_IDS = ['fp_p1ktud_ufmt', 'fp_p1ktud_1oec'];
-            saveAdminIds();
-            console.log('📋 Создан новый список админов:', ADMIN_IDS);
+        } catch (e) {
+            console.log('Ошибка загрузки списка админов');
         }
+    }
+    // Если списка нет — создаём с твоим ID
+    ADMIN_IDS = ['fp_p1ktud_ufmt', 'fp_p1ktud_1oec'];
+    saveAdminIds();
+    console.log('📋 Создан новый список админов:', ADMIN_IDS);
+}
 
-        function saveAdminIds() {
-            localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
-        }
+function saveAdminIds() {
+    localStorage.setItem('adminIds', JSON.stringify(ADMIN_IDS));
+}
 
-        function isUserAdmin() {
-            const result = ADMIN_IDS.includes(userId);
-            console.log('🔍 Проверка ID:', userId, '→', result ? '✅ есть в списке' : '❌ нет в списке');
-            return result;
-        }
-
+function isUserAdmin() {
+    // Убираем все невидимые символы для точного сравнения
+    const cleanUserId = userId.trim();
+    const result = ADMIN_IDS.some(id => id.trim() === cleanUserId);
+    console.log('🔍 Проверка ID:', cleanUserId, '→', result ? '✅ есть в списке' : '❌ нет в списке');
+    return result;
+}
         // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА ★★★
         function addAdminById() {
             const input = document.getElementById('addAdminByIdInput');

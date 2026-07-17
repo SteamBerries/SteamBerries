@@ -2320,12 +2320,6 @@ function addAdminById() {
         return;
     }
 
-    // ★★★ ЗАЩИТА: добавить можно только СВОЙ ID ★★★
-    if (id !== MY_ID) {
-        alert('❌ Вы можете добавить только свой ID!\nВаш ID: ' + MY_ID);
-        return;
-    }
-
     if (ADMIN_IDS.includes(id)) {
         alert('Этот ID уже в списке администраторов!');
         return;

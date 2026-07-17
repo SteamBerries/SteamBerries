@@ -45,12 +45,8 @@
             font-weight: 800;
             color: #8bc34a;
             letter-spacing: 2px;
-            cursor: pointer;
+            cursor: default;
             user-select: none;
-        }
-
-        .header-top h1:hover {
-            opacity: 0.8;
         }
 
         .cart-header {
@@ -1024,7 +1020,7 @@
             }
         }
 
-        /* ===== ДЛЯ АДМИН-ПАНЕЛИ ===== */
+        /* ===== АДМИН-ПАНЕЛЬ ===== */
         #adminPanel {
             display: none;
         }
@@ -1189,6 +1185,142 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== СПИСОК АДМИНОВ ===== */
+        .admin-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #162216;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #2a4a2a;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .admin-item .name {
+            color: #8bc34a;
+            font-weight: 600;
+        }
+        .admin-item .details {
+            font-size: 11px;
+            color: #4a6a4a;
+        }
+        .admin-item button {
+            background: #4a2a2a;
+            color: #c86a6a;
+            border: 1px solid #5a3a3a;
+            border-radius: 30px;
+            padding: 2px 14px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .admin-item button:hover {
+            background: #6a2a2a;
+            color: #ff6a6a;
+        }
+        .admin-add-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .admin-add-section input {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            background: #1a2a1a;
+            border: 1px solid #2a4a2a;
+            border-radius: 8px;
+            color: #c8e0c8;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+        .admin-add-section input:focus {
+            outline: none;
+            border-color: #8bc34a;
+        }
+        .admin-add-section button {
+            padding: 8px 20px;
+            background: #2a4a2a;
+            color: #8bc34a;
+            border: 1px solid #3a5a3a;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .admin-add-section button:hover {
+            background: #3a5a3a;
+        }
+        .admin-list-header {
+            color: #8bc34a;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* ===== ПОЛЬЗОВАТЕЛИ В АДМИНКЕ ===== */
+        .user-log-container {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #162216;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #2a4a2a;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .user-item .name {
+            color: #c8e0c8;
+            font-weight: 600;
+        }
+        .user-item .name.banned {
+            color: #ff6a6a;
+        }
+        .user-item .details {
+            font-size: 11px;
+            color: #4a6a4a;
+        }
+        .user-item button {
+            background: #6a2a2a;
+            color: #ff6a6a;
+            border: 1px solid #8a3a3a;
+            border-radius: 30px;
+            padding: 2px 14px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .user-item button:hover {
+            background: #8a2a2a;
+        }
+        .user-item .status-banned {
+            color: #ff6a6a;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .user-item .status-active {
+            color: #4a6a4a;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -1312,35 +1444,61 @@
                             <button class="btn-ban-self" onclick="banCurrentUser()">🚫 Заблокировать текущего</button>
                         </div>
 
-                        <div class="admin-grid">
-                            <div>
-                                <h3>🚫 Блокировка по нику</h3>
-                                <div class="block">
-                                    <input type="text" id="banNickInput" placeholder="Введите ник" />
-                                    <input type="text" id="banReasonInput" placeholder="Причина (необязательно)" />
-                                    <button class="admin-btn-ban" onclick="banByNick()">🚫 Заблокировать</button>
-                                </div>
-                            </div>
-                            <div>
-                                <h3>🚫 Блокировка по Discord</h3>
-                                <div class="block">
-                                    <input type="text" id="banDiscordInput" placeholder="Введите Discord" />
-                                    <input type="text" id="banReasonInput2" placeholder="Причина (необязательно)" />
-                                    <button class="admin-btn-ban" onclick="banByDiscord()">🚫 Заблокировать</button>
-                                </div>
-                            </div>
+                        <!-- ВКЛАДКИ -->
+                        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                            <button onclick="switchAdminTab('admins')" id="tabAdmins" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">👑 Администраторы</button>
+                            <button onclick="switchAdminTab('users')" id="tabUsers" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">👤 Пользователи</button>
+                            <button onclick="switchAdminTab('bans')" id="tabBans" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">🚫 Баны</button>
                         </div>
 
-                        <div>
-                            <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
-                            <div id="bannedList" class="banned-list-container"></div>
-                            <button class="admin-btn-clear" onclick="clearAllBans()">🗑️ Очистить весь список</button>
+                        <!-- Содержимое вкладок -->
+                        <div id="adminTabContent">
+                            <!-- Администраторы -->
+                            <div id="tabContentAdmins">
+                                <div style="margin-bottom:16px;padding:12px;background:#162216;border-radius:10px;border:1px solid #2a4a2a;">
+                                    <div class="admin-list-header">👑 Управление администраторами</div>
+                                    <div class="admin-add-section">
+                                        <input type="text" id="addAdminNick" placeholder="Ник" />
+                                        <input type="text" id="addAdminDiscord" placeholder="Discord" />
+                                        <button onclick="addAdmin()">➕ Добавить</button>
+                                    </div>
+                                    <div id="adminListContainer" class="admin-list-container"></div>
+                                </div>
+                            </div>
+
+                            <!-- Пользователи -->
+                            <div id="tabContentUsers" style="display:none;">
+                                <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                                    <span style="color:#4a6a4a;">📊 Всего посетителей: <span id="userLogCount" style="color:#8bc34a;font-weight:600;">0</span></span>
+                                    <button onclick="clearUserLog()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:12px;">🗑️ Очистить лог</button>
+                                </div>
+                                <div id="userLogContainer" class="user-log-container"></div>
+                            </div>
+
+                            <!-- Баны -->
+                            <div id="tabContentBans" style="display:none;">
+                                <div>
+                                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
+                                    <div id="bannedList" class="banned-list-container"></div>
+                                    <button class="admin-btn-clear" onclick="clearAllBans()">🗑️ Очистить весь список</button>
+                                </div>
+                                <div style="margin-top:12px;">
+                                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Добавить вручную</h3>
+                                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                        <input type="text" id="manualBanId" placeholder="Fingerprint ID" style="flex:2;min-width:200px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                                        <input type="text" id="manualBanReason" placeholder="Причина" style="flex:1;min-width:120px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                                        <button onclick="banById(document.getElementById('manualBanId').value, document.getElementById('manualBanReason').value || 'Нарушение правил');document.getElementById('manualBanId').value='';document.getElementById('manualBanReason').value='';" style="padding:8px 20px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
+                                    </div>
+                                    <div style="margin-top:8px;color:#4a6a4a;font-size:12px;">
+                                        💡 Вставьте ID из лога пользователей (начинается с fp_)
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
-                            <p>🔒 Блокировка работает по отпечатку браузера (fingerprint), нику и Discord ID.</p>
-                            <p>💡 Заблокированный пользователь не сможет оформить заказ.</p>
                             <p>📌 Ваш ID: <span id="userIdDisplay2" style="color:#8bc34a;">загрузка...</span></p>
+                            <p>🔒 Блокировка работает по отпечатку браузера (fingerprint)</p>
                         </div>
                     </div>
                 </div>
@@ -1967,21 +2125,467 @@
         }
 
         // ============================================
-        //  СКРЫТАЯ АДМИН-ПАНЕЛЬ
+        //  ЛОГИРОВАНИЕ ПОЛЬЗОВАТЕЛЕЙ
         // ============================================
 
-        // Функция добавления кнопки админки
+        // Загружаем историю посещений
+        let userLog = JSON.parse(localStorage.getItem('userLog')) || [];
+
+        function logUserVisit() {
+            const nick = document.getElementById('playerNick')?.value?.trim() || 'Не указан';
+            const discord = document.getElementById('playerDiscord')?.value?.trim() || 'Не указан';
+
+            const existing = userLog.find(entry => entry.id === userId);
+            if (existing) {
+                existing.lastVisit = new Date().toISOString();
+                existing.nick = nick;
+                existing.discord = discord;
+                existing.visitCount = (existing.visitCount || 0) + 1;
+            } else {
+                userLog.push({
+                    id: userId,
+                    nick: nick,
+                    discord: discord,
+                    firstVisit: new Date().toISOString(),
+                    lastVisit: new Date().toISOString(),
+                    visitCount: 1,
+                    isBanned: isUserBanned()
+                });
+            }
+
+            localStorage.setItem('userLog', JSON.stringify(userLog));
+        }
+
+        // Логируем при загрузке страницы
+        logUserVisit();
+
+        // Логируем при заполнении формы
+        document.getElementById('playerNick')?.addEventListener('change', logUserVisit);
+        document.getElementById('playerDiscord')?.addEventListener('change', logUserVisit);
+
+        // ============================================
+        //  БЛОКИРОВКА ПО ID ИЗ ЛОГА
+        // ============================================
+
+        function banById(userIdToBan, reason = 'Нарушение правил') {
+            if (!userIdToBan || userIdToBan.trim() === '') {
+                alert('❌ Введите ID пользователя!');
+                return;
+            }
+
+            const user = userLog.find(entry => entry.id === userIdToBan.trim());
+            if (!user) {
+                alert('❌ Пользователь с таким ID не найден в логе!');
+                return;
+            }
+
+            if (bannedUsers.some(u => u.id === userIdToBan.trim())) {
+                alert('⚠️ Этот пользователь уже заблокирован!');
+                return;
+            }
+
+            const bannedItem = {
+                id: userIdToBan.trim(),
+                nick: user.nick || 'Неизвестный',
+                discord: user.discord || 'Неизвестный',
+                reason: reason,
+                timestamp: new Date().toISOString()
+            };
+
+            bannedUsers.push(bannedItem);
+            saveBannedUsers();
+            renderBannedList();
+            renderUserLog();
+            alert(`✅ Пользователь "${user.nick || user.id}" заблокирован!`);
+        }
+
+        // ============================================
+        //  ОТОБРАЖЕНИЕ ЛОГА ПОЛЬЗОВАТЕЛЕЙ
+        // ============================================
+
+        function renderUserLog() {
+            const container = document.getElementById('userLogContainer');
+            if (!container) return;
+
+            if (userLog.length === 0) {
+                container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">📭 Нет записей</div>';
+                document.getElementById('userLogCount').textContent = '0';
+                return;
+            }
+
+            document.getElementById('userLogCount').textContent = userLog.length;
+
+            const sorted = [...userLog].sort((a, b) => new Date(b.lastVisit) - new Date(a.lastVisit));
+
+            let html = '';
+            sorted.forEach((user) => {
+                const isBanned = bannedUsers.some(u => u.id === user.id);
+                const displayName = user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним');
+
+                html += `
+                    <div class="user-item">
+                        <div>
+                            <div class="name ${isBanned ? 'banned' : ''}">
+                                ${isBanned ? '🚫 ' : '👤 '} ${displayName}
+                                ${user.nick !== 'Не указан' ? `(${user.nick})` : ''}
+                            </div>
+                            <div class="details">
+                                ID: ${user.id.slice(0, 20)}... · Посещений: ${user.visitCount} · Последний визит: ${new Date(user.lastVisit).toLocaleString()}
+                            </div>
+                        </div>
+                        <div>
+                            ${isBanned ? `<span class="status-banned">🚫 Заблокирован</span>` : `<button onclick="banById('${user.id}','Нарушение правил')">🚫 Заблокировать</button>`}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        //  ОЧИСТКА ЛОГА
+        // ============================================
+
+        function clearUserLog() {
+            if (confirm('⚠️ Очистить историю посещений?')) {
+                userLog = [];
+                localStorage.setItem('userLog', JSON.stringify(userLog));
+                renderUserLog();
+                alert('✅ Лог очищен!');
+            }
+        }
+
+        // ============================================
+        //  СИСТЕМА АДМИНИСТРАТОРОВ (localStorage)
+        // ============================================
+
+        function getAdminList() {
+            const stored = localStorage.getItem('adminList');
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    return [
+                        { nick: 'Kutonea', discord: 'al0nea' }
+                    ];
+                }
+            }
+            const defaultList = [
+                { nick: 'Kutonea', discord: 'al0nea' }
+            ];
+            localStorage.setItem('adminList', JSON.stringify(defaultList));
+            return defaultList;
+        }
+
+        let ADMIN_LIST = getAdminList();
+
+        function saveAdminList(list) {
+            localStorage.setItem('adminList', JSON.stringify(list));
+        }
+
+        function isUserAdmin() {
+            const nick = document.getElementById('playerNick')?.value?.trim() || '';
+            const discord = document.getElementById('playerDiscord')?.value?.trim() || '';
+
+            const savedNick = localStorage.getItem('adminNick') || '';
+            const savedDiscord = localStorage.getItem('adminDiscord') || '';
+
+            const checkNick = nick || savedNick;
+            const checkDiscord = discord || savedDiscord;
+
+            return ADMIN_LIST.some(admin => {
+                if (admin.nick && checkNick && admin.nick.toLowerCase() === checkNick.toLowerCase()) return true;
+                if (admin.discord && checkDiscord && admin.discord.toLowerCase() === checkDiscord.toLowerCase()) return true;
+                return false;
+            });
+        }
+
+        function saveUserCredentials() {
+            const nick = document.getElementById('playerNick')?.value?.trim();
+            const discord = document.getElementById('playerDiscord')?.value?.trim();
+            if (nick) localStorage.setItem('adminNick', nick);
+            if (discord) localStorage.setItem('adminDiscord', discord);
+        }
+
+        // Управление администраторами
+        function addAdmin() {
+            const nick = document.getElementById('addAdminNick')?.value?.trim();
+            const discord = document.getElementById('addAdminDiscord')?.value?.trim();
+
+            if (!nick && !discord) {
+                alert('Введите ник или Discord!');
+                return;
+            }
+
+            const exists = ADMIN_LIST.some(admin => {
+                if (nick && admin.nick && admin.nick.toLowerCase() === nick.toLowerCase()) return true;
+                if (discord && admin.discord && admin.discord.toLowerCase() === discord.toLowerCase()) return true;
+                return false;
+            });
+
+            if (exists) {
+                alert('⚠️ Этот пользователь уже в списке администраторов!');
+                return;
+            }
+
+            ADMIN_LIST.push({ nick: nick || '', discord: discord || '' });
+            saveAdminList(ADMIN_LIST);
+            renderAdminList();
+            document.getElementById('addAdminNick').value = '';
+            document.getElementById('addAdminDiscord').value = '';
+            alert('✅ Администратор добавлен!');
+        }
+
+        function removeAdmin(index) {
+            if (confirm(`Удалить администратора "${ADMIN_LIST[index].nick || ADMIN_LIST[index].discord}"?`)) {
+                ADMIN_LIST.splice(index, 1);
+                saveAdminList(ADMIN_LIST);
+                renderAdminList();
+                alert('✅ Администратор удалён!');
+            }
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById('adminListContainer');
+            if (!container) return;
+
+            if (ADMIN_LIST.length === 0) {
+                container.innerHTML = '<div style="color:#4a6a4a;padding:8px;">📭 Список администраторов пуст</div>';
+                return;
+            }
+
+            let html = '';
+            ADMIN_LIST.forEach((admin, index) => {
+                const displayName = admin.nick || admin.discord || 'Неизвестный';
+                const details = [];
+                if (admin.nick) details.push(`Ник: ${admin.nick}`);
+                if (admin.discord) details.push(`Discord: ${admin.discord}`);
+
+                html += `
+                    <div class="admin-item">
+                        <div>
+                            <span class="name">👑 ${displayName}</span>
+                            <div class="details">${details.join(' · ')}</div>
+                        </div>
+                        <button onclick="removeAdmin(${index})">Удалить</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        //  АДМИН-ПАНЕЛЬ (ОБНОВЛЁННАЯ)
+        // ============================================
+
+        function showAdminPanel() {
+            saveUserCredentials();
+
+            let adminContainer = document.getElementById('adminPanel');
+            if (!adminContainer) {
+                adminContainer = document.createElement('div');
+                adminContainer.id = 'adminPanel';
+                adminContainer.className = 'page-content';
+                document.querySelector('.content-area').appendChild(adminContainer);
+            }
+
+            document.querySelectorAll('.page-content').forEach(p => {
+                if (p.id !== 'adminPanel') p.classList.remove('active');
+            });
+            adminContainer.classList.add('active');
+            adminContainer.style.display = 'block';
+
+            adminContainer.innerHTML = `
+                <div class="info-block" style="border-color:#6a3a3a;">
+                    <h2 style="color:#ff6a6a;">⚙️ Админ-панель</h2>
+
+                    <div class="admin-current-user">
+                        <div>
+                            <span class="label">🔑 Ваш ID:</span>
+                            <span class="id" id="userIdDisplay">${userId}</span>
+                        </div>
+                        <button class="btn-ban-self" onclick="banCurrentUser()">🚫 Заблокировать текущего</button>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                        <button onclick="switchAdminTab('admins')" id="tabAdmins" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">👑 Администраторы</button>
+                        <button onclick="switchAdminTab('users')" id="tabUsers" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">👤 Пользователи</button>
+                        <button onclick="switchAdminTab('bans')" id="tabBans" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">🚫 Баны</button>
+                    </div>
+
+                    <div id="adminTabContent">
+                        <div id="tabContentAdmins">
+                            <div style="margin-bottom:16px;padding:12px;background:#162216;border-radius:10px;border:1px solid #2a4a2a;">
+                                <div class="admin-list-header">👑 Управление администраторами</div>
+                                <div class="admin-add-section">
+                                    <input type="text" id="addAdminNick" placeholder="Ник" />
+                                    <input type="text" id="addAdminDiscord" placeholder="Discord" />
+                                    <button onclick="addAdmin()">➕ Добавить</button>
+                                </div>
+                                <div id="adminListContainer" class="admin-list-container"></div>
+                            </div>
+                        </div>
+
+                        <div id="tabContentUsers" style="display:none;">
+                            <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                                <span style="color:#4a6a4a;">📊 Всего посетителей: <span id="userLogCount" style="color:#8bc34a;font-weight:600;">${userLog.length}</span></span>
+                                <button onclick="clearUserLog()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:12px;">🗑️ Очистить лог</button>
+                            </div>
+                            <div id="userLogContainer" class="user-log-container"></div>
+                        </div>
+
+                        <div id="tabContentBans" style="display:none;">
+                            <div>
+                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
+                                <div id="bannedList" class="banned-list-container"></div>
+                                <button class="admin-btn-clear" onclick="clearAllBans()">🗑️ Очистить весь список</button>
+                            </div>
+                            <div style="margin-top:12px;">
+                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Добавить вручную</h3>
+                                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                    <input type="text" id="manualBanId" placeholder="Fingerprint ID" style="flex:2;min-width:200px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                                    <input type="text" id="manualBanReason" placeholder="Причина" style="flex:1;min-width:120px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                                    <button onclick="banById(document.getElementById('manualBanId').value, document.getElementById('manualBanReason').value || 'Нарушение правил');document.getElementById('manualBanId').value='';document.getElementById('manualBanReason').value='';" style="padding:8px 20px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
+                                </div>
+                                <div style="margin-top:8px;color:#4a6a4a;font-size:12px;">
+                                    💡 Вставьте ID из лога пользователей (начинается с fp_)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
+                        <p>📌 Ваш ID: <span id="userIdDisplay2" style="color:#8bc34a;">${userId}</span></p>
+                        <p>🔒 Блокировка работает по отпечатку браузера (fingerprint)</p>
+                    </div>
+                </div>
+            `;
+
+            renderAdminList();
+            renderBannedList();
+            renderUserLog();
+            document.getElementById('userIdDisplay').textContent = userId;
+            document.getElementById('userIdDisplay2').textContent = userId;
+        }
+
+        // ============================================
+        //  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В АДМИНКЕ
+        // ============================================
+
+        function switchAdminTab(tab) {
+            document.getElementById('tabContentAdmins').style.display = 'none';
+            document.getElementById('tabContentUsers').style.display = 'none';
+            document.getElementById('tabContentBans').style.display = 'none';
+
+            document.getElementById('tabAdmins').style.background = '#1a2a2a';
+            document.getElementById('tabAdmins').style.color = '#6a8a6a';
+            document.getElementById('tabAdmins').style.borderColor = '#2a3a2a';
+            document.getElementById('tabUsers').style.background = '#1a2a2a';
+            document.getElementById('tabUsers').style.color = '#6a8a6a';
+            document.getElementById('tabUsers').style.borderColor = '#2a3a2a';
+            document.getElementById('tabBans').style.background = '#1a2a2a';
+            document.getElementById('tabBans').style.color = '#6a8a6a';
+            document.getElementById('tabBans').style.borderColor = '#2a3a2a';
+
+            if (tab === 'admins') {
+                document.getElementById('tabContentAdmins').style.display = 'block';
+                document.getElementById('tabAdmins').style.background = '#2a4a2a';
+                document.getElementById('tabAdmins').style.color = '#8bc34a';
+                document.getElementById('tabAdmins').style.borderColor = '#3a5a3a';
+                renderAdminList();
+            } else if (tab === 'users') {
+                document.getElementById('tabContentUsers').style.display = 'block';
+                document.getElementById('tabUsers').style.background = '#2a4a2a';
+                document.getElementById('tabUsers').style.color = '#8bc34a';
+                document.getElementById('tabUsers').style.borderColor = '#3a5a3a';
+                renderUserLog();
+            } else if (tab === 'bans') {
+                document.getElementById('tabContentBans').style.display = 'block';
+                document.getElementById('tabBans').style.background = '#2a4a2a';
+                document.getElementById('tabBans').style.color = '#8bc34a';
+                document.getElementById('tabBans').style.borderColor = '#3a5a3a';
+                renderBannedList();
+            }
+        }
+
+        // ============================================
+        //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ + ПАРОЛЬ
+        // ============================================
+
+        const SECRET_KEY = 'nyuhach2026';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminKey = urlParams.get('admin');
+
+        function checkAdminAccess() {
+            if (!isUserAdmin()) {
+                alert('❌ У вас нет доступа к админ-панели!');
+                return false;
+            }
+
+            if (sessionStorage.getItem('adminAuthorized') === 'true') {
+                return true;
+            }
+
+            const password = prompt('🔐 Введите пароль для доступа к админ-панели:');
+            if (!password) return false;
+
+            if (password === 'admin123') {
+                sessionStorage.setItem('adminAuthorized', 'true');
+                return true;
+            } else {
+                alert('❌ Неверный пароль!');
+                return false;
+            }
+        }
+
+        if (adminKey === SECRET_KEY) {
+            if (!isUserAdmin()) {
+                alert('❌ У вас нет доступа к админ-панели!');
+                history.replaceState(null, '', window.location.pathname);
+            } else {
+                if (sessionStorage.getItem('adminAuthorized') === 'true') {
+                    showAdminButton();
+                    setTimeout(() => {
+                        document.querySelector('.nav-link[data-page="admin"]')?.click();
+                    }, 300);
+                } else {
+                    const password = prompt('Введите пароль:');
+                    if (password === 'admin123') {
+                        sessionStorage.setItem('adminAuthorized', 'true');
+                        showAdminButton();
+                        setTimeout(() => {
+                            document.querySelector('.nav-link[data-page="admin"]')?.click();
+                        }, 300);
+                        history.replaceState(null, '', window.location.pathname);
+                    } else if (password !== null) {
+                        alert('❌ Неверный пароль!');
+                        history.replaceState(null, '', window.location.pathname);
+                    } else {
+                        history.replaceState(null, '', window.location.pathname);
+                    }
+                }
+            }
+        }
+
+        // ============================================
+        //  ПОКАЗ КНОПКИ АДМИНКИ
+        // ============================================
+
         function showAdminButton() {
+            if (!checkAdminAccess()) return;
+
             const navMenu = document.getElementById('navMenu');
             if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
                 const adminBtn = document.createElement('button');
                 adminBtn.className = 'nav-link';
                 adminBtn.dataset.page = 'admin';
-                adminBtn.textContent = '⚙️ Админ';
+                adminBtn.textContent = 'Админ';
                 adminBtn.style.color = '#ff6a6a';
                 navMenu.appendChild(adminBtn);
 
                 adminBtn.addEventListener('click', function() {
+                    if (!checkAdminAccess()) return;
                     navLinks.forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
                     const page = 'admin';
@@ -1995,66 +2599,31 @@
                         pages[page].classList.add('active');
                         pages[page].style.display = 'block';
                     }
-                    // Обновляем ID в админке
                     document.getElementById('userIdDisplay').textContent = userId;
-                    document.getElementById('userIdDisplay2').textContent = userId;
+                    renderAdminList();
                     renderBannedList();
+                    renderUserLog();
                 });
             }
         }
 
-        // 1. Двойной клик по заголовку
-        const siteTitle = document.getElementById('siteTitle');
-        if (siteTitle) {
-            let clickCount = 0;
-            let clickTimer = null;
-            siteTitle.addEventListener('click', function() {
-                clickCount++;
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-                if (clickCount >= 2) {
-                    clickCount = 0;
-                    clearTimeout(clickTimer);
-                    showAdminButton();
-                    document.querySelector('.nav-link[data-page="admin"]')?.click();
-                }
-            });
-            siteTitle.title = 'Двойной клик — админ-панель';
-        }
+        // ============================================
+        //  СКРЫТЬ АДМИН-ПАНЕЛЬ (Ctrl+Shift+H)
+        // ============================================
 
-        // 2. Секретная ссылка (?admin=nyuhach2026)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'nyuhach2026') {
-            setTimeout(() => {
-                showAdminButton();
-                document.querySelector('.nav-link[data-page="admin"]')?.click();
-            }, 500);
-        }
-
-        // 3. Комбинация клавиш Ctrl+Shift+A
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
-                e.preventDefault();
-                showAdminButton();
-                document.querySelector('.nav-link[data-page="admin"]')?.click();
-            }
-        });
-
-        // 4. Скрыть админ-панель Ctrl+Shift+H
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
                 e.preventDefault();
                 const adminBtn = document.querySelector('.nav-link[data-page="admin"]');
-                if (adminBtn) {
-                    adminBtn.remove();
-                }
+                if (adminBtn) adminBtn.remove();
                 const adminPanel = document.getElementById('adminPanel');
                 if (adminPanel) {
                     adminPanel.classList.remove('active');
                     adminPanel.style.display = 'none';
                 }
                 document.querySelector('.nav-link[data-page="info"]')?.click();
-                alert('🔒 Админ-панель скрыта');
+                sessionStorage.removeItem('adminAuthorized');
+                alert('Админ-панель скрыта');
             }
         });
 
@@ -2172,7 +2741,7 @@
         });
 
         // ============================================
-        //  ОТПРАВКА ЗАЯВКИ (С ПРОВЕРКОЙ БАНА)
+        //  ОТПРАВКА ЗАЯВКИ (С ID ПОЛЬЗОВАТЕЛЯ)
         // ============================================
         submitApplicationBtn.addEventListener('click', async function() {
             const nick = document.getElementById('playerNick').value.trim();
@@ -2191,6 +2760,7 @@
                 return;
             }
 
+            // ★★★ ФОРМИРУЕМ ЗАЯВКУ С ID ★★★
             const embed = {
                 title: '📦 Новая заявка!',
                 color: 0x8bc34a,
@@ -2199,7 +2769,12 @@
                     { name: '💬 Discord', value: discord, inline: true },
                     { name: '📍 ПВЗ', value: pzv, inline: false },
                     { name: '📦 Товар', value: item, inline: true },
-                    { name: '💰 Цена', value: currentItemPrice || 'Не указана', inline: true }
+                    { name: '💰 Цена', value: currentItemPrice || 'Не указана', inline: true },
+                    { 
+                        name: '🆔 ID пользователя', 
+                        value: userId || 'Неизвестно', 
+                        inline: false 
+                    }
                 ],
                 timestamp: new Date().toISOString(),
                 footer: { text: 'Нюхач | Магазин сервера' }
@@ -2263,19 +2838,16 @@
         filterItems('all');
         updateCartUI();
 
-        // Обновляем ID в админке
         document.getElementById('userIdDisplay').textContent = userId;
         document.getElementById('userIdDisplay2').textContent = userId;
 
-        console.log('✅ Сайт готов!');
-        console.log('🕵️ Админ-панель скрыта!');
-        console.log('🔑 Способы открытия:');
-        console.log('  • Двойной клик по названию сайта');
-        console.log('  • Ссылка: ?admin=nyuhach2026');
-        console.log('  • Клавиши: Ctrl+Shift+A');
-        console.log('🔒 Скрыть: Ctrl+Shift+H');
-        console.log('📍 Webhook URL:', WEBHOOK_URL);
-        console.log('🔑 Ваш ID:', userId);
+        console.log('Сайт готов!');
+        console.log('Секретная ссылка для входа в админ-панель:');
+        console.log(window.location.origin + window.location.pathname + '?admin=' + SECRET_KEY);
+        console.log('Пароль: admin123');
+        console.log('Список администраторов:', ADMIN_LIST);
+        console.log('Скрыть админку: Ctrl+Shift+H');
+        console.log('Ваш ID:', userId);
     </script>
 
 </body>

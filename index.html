@@ -1305,19 +1305,6 @@
             color: #4a6a4a;
             font-size: 12px;
         }
-
-        /* Скрываем список админов от посторонних */
-        #adminListContainer .admin-item .details {
-            font-size: 10px;
-            color: #3a4a3a;
-        }
-        #adminListContainer .admin-item .name {
-            font-size: 14px;
-        }
-        /* Делаем список менее заметным */
-        #adminListContainer {
-            opacity: 0.85;
-        }
     </style>
 </head>
 <body>
@@ -2269,22 +2256,22 @@
             return ADMIN_IDS.includes(userId);
         }
 
-        // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА (ИСПРАВЛЕНА) ★★★
+        // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА ★★★
         function addAdminById() {
             const input = document.getElementById('addAdminByIdInput');
             if (!input) return;
             const id = input.value.trim();
-            
+
             if (!id) {
                 alert('Введите ID пользователя!');
                 return;
             }
-            
+
             if (ADMIN_IDS.includes(id)) {
                 alert('Этот ID уже в списке администраторов!');
                 return;
             }
-            
+
             ADMIN_IDS.push(id);
             saveAdminIds();
             renderAdminList();
@@ -2338,194 +2325,73 @@
         }
 
         // ============================================
-        //  АДМИН-ПАНЕЛЬ
-        // ============================================
-
-        function showAdminPanel() {
-            loadAdminIds();
-
-            let adminContainer = document.getElementById('adminPanel');
-            if (!adminContainer) {
-                adminContainer = document.createElement('div');
-                adminContainer.id = 'adminPanel';
-                adminContainer.className = 'page-content';
-                document.querySelector('.content-area').appendChild(adminContainer);
-            }
-
-            document.querySelectorAll('.page-content').forEach(p => {
-                if (p.id !== 'adminPanel') p.classList.remove('active');
-            });
-            adminContainer.classList.add('active');
-            adminContainer.style.display = 'block';
-
-            adminContainer.innerHTML = `
-                <div class="info-block" style="border-color:#6a3a3a;">
-                    <h2 style="color:#ff6a6a;">Админ-панель</h2>
-
-                    <div class="admin-current-user">
-                        <div>
-                            <span class="label">Ваш ID:</span>
-                            <span class="id" id="userIdDisplay">${userId}</span>
-                        </div>
-                        <button class="btn-ban-self" onclick="banCurrentUser()">Заблокировать текущего</button>
-                    </div>
-
-                    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-                        <button onclick="switchAdminTab('admins')" id="tabAdmins" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">Администраторы</button>
-                        <button onclick="switchAdminTab('users')" id="tabUsers" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">Пользователи</button>
-                        <button onclick="switchAdminTab('bans')" id="tabBans" style="padding:8px 20px;background:#1a2a2a;color:#6a8a6a;border:1px solid #2a3a2a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;">Баны</button>
-                    </div>
-
-                    <div id="adminTabContent">
-                        <div id="tabContentAdmins">
-                            <div style="margin-bottom:16px;padding:12px;background:#162216;border-radius:10px;border:1px solid #2a4a2a;">
-                                <div class="admin-list-header">Управление администраторами</div>
-                                <div class="admin-add-section">
-                                    <input type="text" id="addAdminByIdInput" placeholder="Fingerprint ID" style="flex:1;min-width:200px;padding:8px 12px;background:#1a2a1a;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <button onclick="addAdminById()" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
-                                </div>
-                                <div id="adminListContainer" class="admin-list-container"></div>
-                                <div style="margin-top:8px;color:#3a4a3a;font-size:11px;">Доступ только для администраторов</div>
-                            </div>
-                        </div>
-
-                        <div id="tabContentUsers" style="display:none;">
-                            <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-                                <span style="color:#4a6a4a;">Всего посетителей: <span id="userLogCount" style="color:#8bc34a;font-weight:600;">${userLog.length}</span></span>
-                                <button onclick="clearUserLog()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:12px;">Очистить лог</button>
-                            </div>
-                            <div id="userLogContainer" class="user-log-container"></div>
-                        </div>
-
-                        <div id="tabContentBans" style="display:none;">
-                            <div>
-                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Черный список</h3>
-                                <div id="bannedList" class="banned-list-container"></div>
-                                <button class="admin-btn-clear" onclick="clearAllBans()">Очистить весь список</button>
-                            </div>
-                            <div style="margin-top:12px;">
-                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Добавить вручную</h3>
-                                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                                    <input type="text" id="manualBanId" placeholder="Fingerprint ID" style="flex:2;min-width:200px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <input type="text" id="manualBanReason" placeholder="Причина" style="flex:1;min-width:120px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <button onclick="banById(document.getElementById('manualBanId').value, document.getElementById('manualBanReason').value || 'Нарушение правил');document.getElementById('manualBanId').value='';document.getElementById('manualBanReason').value='';" style="padding:8px 20px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Заблокировать</button>
-                                </div>
-                                <div style="margin-top:8px;color:#4a6a4a;font-size:12px;">
-                                    Вставьте ID из лога пользователей (начинается с fp_)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
-                        <p>Ваш ID: <span id="userIdDisplay2" style="color:#8bc34a;">${userId}</span></p>
-                        <p>Блокировка работает по отпечатку браузера (fingerprint)</p>
-                    </div>
-                </div>
-            `;
-
-            renderAdminList();
-            renderBannedList();
-            renderUserLog();
-            document.getElementById('userIdDisplay').textContent = userId;
-            document.getElementById('userIdDisplay2').textContent = userId;
-        }
-
-        // ============================================
-        //  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В АДМИНКЕ
-        // ============================================
-
-        function switchAdminTab(tab) {
-            document.getElementById('tabContentAdmins').style.display = 'none';
-            document.getElementById('tabContentUsers').style.display = 'none';
-            document.getElementById('tabContentBans').style.display = 'none';
-
-            document.getElementById('tabAdmins').style.background = '#1a2a2a';
-            document.getElementById('tabAdmins').style.color = '#6a8a6a';
-            document.getElementById('tabAdmins').style.borderColor = '#2a3a2a';
-            document.getElementById('tabUsers').style.background = '#1a2a2a';
-            document.getElementById('tabUsers').style.color = '#6a8a6a';
-            document.getElementById('tabUsers').style.borderColor = '#2a3a2a';
-            document.getElementById('tabBans').style.background = '#1a2a2a';
-            document.getElementById('tabBans').style.color = '#6a8a6a';
-            document.getElementById('tabBans').style.borderColor = '#2a3a2a';
-
-            if (tab === 'admins') {
-                document.getElementById('tabContentAdmins').style.display = 'block';
-                document.getElementById('tabAdmins').style.background = '#2a4a2a';
-                document.getElementById('tabAdmins').style.color = '#8bc34a';
-                document.getElementById('tabAdmins').style.borderColor = '#3a5a3a';
-                renderAdminList();
-            } else if (tab === 'users') {
-                document.getElementById('tabContentUsers').style.display = 'block';
-                document.getElementById('tabUsers').style.background = '#2a4a2a';
-                document.getElementById('tabUsers').style.color = '#8bc34a';
-                document.getElementById('tabUsers').style.borderColor = '#3a5a3a';
-                renderUserLog();
-            } else if (tab === 'bans') {
-                document.getElementById('tabContentBans').style.display = 'block';
-                document.getElementById('tabBans').style.background = '#2a4a2a';
-                document.getElementById('tabBans').style.color = '#8bc34a';
-                document.getElementById('tabBans').style.borderColor = '#3a5a3a';
-                renderBannedList();
-            }
-        }
-
-        // ============================================
-        //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ + ПАРОЛЬ
+        //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ (СНАЧАЛА ПАРОЛЬ, ПОТОМ ID)
         // ============================================
 
         const SECRET_KEY = 'nyuhach2026';
         const urlParams = new URLSearchParams(window.location.search);
         const adminKey = urlParams.get('admin');
 
+        // Функция проверки доступа (СНАЧАЛА ПАРОЛЬ, ПОТОМ ID)
         function checkAdminAccess() {
+            // 1. СНАЧАЛА ПРОВЕРЯЕМ ПАРОЛЬ
+            if (sessionStorage.getItem('adminAuthorized') !== 'true') {
+                const password = prompt('Введите пароль для доступа к админ-панели:');
+                if (!password) return false;
+                if (password !== 'admin123') {
+                    alert('Неверный пароль!');
+                    return false;
+                }
+                sessionStorage.setItem('adminAuthorized', 'true');
+            }
+
+            // 2. ПОТОМ ПРОВЕРЯЕМ ID
             if (!isUserAdmin()) {
                 alert('У вас нет доступа к админ-панели!');
+                sessionStorage.removeItem('adminAuthorized');
                 return false;
             }
 
-            if (sessionStorage.getItem('adminAuthorized') === 'true') {
-                return true;
-            }
-
-            const password = prompt('Введите пароль для доступа к админ-панели:');
-            if (!password) return false;
-
-            if (password === 'admin123') {
-                sessionStorage.setItem('adminAuthorized', 'true');
-                return true;
-            } else {
-                alert('Неверный пароль!');
-                return false;
-            }
+            return true;
         }
 
+        // Если в URL есть секретный ключ — пробуем открыть админку
         if (adminKey === SECRET_KEY) {
-            if (!isUserAdmin()) {
-                alert('У вас нет доступа к админ-панели!');
-                history.replaceState(null, '', window.location.pathname);
-            } else {
-                if (sessionStorage.getItem('adminAuthorized') === 'true') {
+            // Сначала запрашиваем пароль
+            if (sessionStorage.getItem('adminAuthorized') === 'true') {
+                // Уже авторизован — проверяем ID
+                if (!isUserAdmin()) {
+                    alert('У вас нет доступа к админ-панели!');
+                    sessionStorage.removeItem('adminAuthorized');
+                    history.replaceState(null, '', window.location.pathname);
+                } else {
                     showAdminButton();
                     setTimeout(() => {
                         document.querySelector('.nav-link[data-page="admin"]')?.click();
                     }, 300);
-                } else {
-                    const password = prompt('Введите пароль:');
-                    if (password === 'admin123') {
-                        sessionStorage.setItem('adminAuthorized', 'true');
+                }
+            } else {
+                // Запрашиваем пароль
+                const password = prompt('Введите пароль для доступа к админ-панели:');
+                if (password === 'admin123') {
+                    sessionStorage.setItem('adminAuthorized', 'true');
+                    // Теперь проверяем ID
+                    if (!isUserAdmin()) {
+                        alert('У вас нет доступа к админ-панели!');
+                        sessionStorage.removeItem('adminAuthorized');
+                        history.replaceState(null, '', window.location.pathname);
+                    } else {
                         showAdminButton();
                         setTimeout(() => {
                             document.querySelector('.nav-link[data-page="admin"]')?.click();
                         }, 300);
                         history.replaceState(null, '', window.location.pathname);
-                    } else if (password !== null) {
-                        alert('Неверный пароль!');
-                        history.replaceState(null, '', window.location.pathname);
-                    } else {
-                        history.replaceState(null, '', window.location.pathname);
                     }
+                } else if (password !== null) {
+                    alert('Неверный пароль!');
+                    history.replaceState(null, '', window.location.pathname);
+                } else {
+                    history.replaceState(null, '', window.location.pathname);
                 }
             }
         }

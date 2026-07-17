@@ -1953,8 +1953,6 @@
 
        let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
 
-// Сохраняем
-localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
         function saveBannedUsers() {
             localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
         }

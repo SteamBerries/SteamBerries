@@ -45,6 +45,12 @@
             font-weight: 800;
             color: #8bc34a;
             letter-spacing: 2px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .header-top h1:hover {
+            opacity: 0.8;
         }
 
         .cart-header {
@@ -1017,6 +1023,172 @@
                 flex-wrap: wrap;
             }
         }
+
+        /* ===== ДЛЯ АДМИН-ПАНЕЛИ ===== */
+        #adminPanel {
+            display: none;
+        }
+        #adminPanel.active {
+            display: block;
+        }
+        .banned-list-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .banned-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #162216;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #2a4a2a;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .banned-item .info {
+            color: #c8e0c8;
+        }
+        .banned-item .info .nick {
+            color: #ff6a6a;
+            font-weight: 600;
+        }
+        .banned-item .info .details {
+            font-size: 11px;
+            color: #4a6a4a;
+            margin-top: 2px;
+        }
+        .banned-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .banned-item .actions button {
+            background: #4a2a2a;
+            color: #c86a6a;
+            border: 1px solid #5a3a3a;
+            border-radius: 30px;
+            padding: 4px 16px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .banned-item .actions button:hover {
+            background: #6a2a2a;
+            color: #ff6a6a;
+        }
+        .admin-input-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .admin-input-group input {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 14px;
+            background: #162216;
+            border: 1px solid #2a4a2a;
+            border-radius: 10px;
+            color: #c8e0c8;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+        .admin-input-group input:focus {
+            outline: none;
+            border-color: #8bc34a;
+        }
+        .admin-btn-ban {
+            padding: 10px 24px;
+            background: #6a2a2a;
+            color: #ff6a6a;
+            border: 1px solid #8a3a3a;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .admin-btn-ban:hover {
+            background: #8a2a2a;
+        }
+        .admin-btn-clear {
+            background: #2a1a1a;
+            color: #8a5a5a;
+            border: 1px solid #3a2a2a;
+            border-radius: 30px;
+            padding: 6px 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .admin-btn-clear:hover {
+            background: #3a1a1a;
+            color: #aa6a6a;
+        }
+        .admin-current-user {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #162216;
+            border-radius: 8px;
+            border: 1px solid #2a4a2a;
+            margin-bottom: 16px;
+        }
+        .admin-current-user .label {
+            color: #4a6a4a;
+            font-size: 13px;
+        }
+        .admin-current-user .id {
+            color: #8bc34a;
+            font-weight: 600;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .admin-current-user .btn-ban-self {
+            background: #6a2a2a;
+            color: #ff6a6a;
+            border: 1px solid #8a3a3a;
+            border-radius: 30px;
+            padding: 4px 16px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .admin-current-user .btn-ban-self:hover {
+            background: #8a2a2a;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .admin-grid h3 {
+            color: #8bc34a;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .admin-grid .block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        @media (max-width: 600px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1026,7 +1198,7 @@
         <!-- ===== ШАПКА С КОРЗИНОЙ ===== -->
         <header class="header">
             <div class="header-top">
-                <h1>Нюхач</h1>
+                <h1 id="siteTitle">Нюхач</h1>
             </div>
             <div class="cart-header" id="cartHeader">
                 <span class="cart-icon">🛒</span>
@@ -1039,7 +1211,7 @@
         <div class="main-layout">
 
             <!-- НАВИГАЦИЯ -->
-            <nav class="nav-menu">
+            <nav class="nav-menu" id="navMenu">
                 <button class="nav-link active" data-page="info">Информация</button>
                 <button class="nav-link" data-page="news">Новости</button>
                 <button class="nav-link" data-page="support">Поддержка</button>
@@ -1127,6 +1299,52 @@
                     <div class="grid" id="itemsGrid"></div>
                 </div>
 
+                <!-- АДМИН-ПАНЕЛЬ (скрыта по умолчанию) -->
+                <div class="page-content" id="adminPanel">
+                    <div class="info-block" style="border-color:#6a3a3a;">
+                        <h2 style="color:#ff6a6a;">⚙️ Админ-панель</h2>
+
+                        <div class="admin-current-user">
+                            <div>
+                                <span class="label">🔑 Ваш ID:</span>
+                                <span class="id" id="userIdDisplay">загрузка...</span>
+                            </div>
+                            <button class="btn-ban-self" onclick="banCurrentUser()">🚫 Заблокировать текущего</button>
+                        </div>
+
+                        <div class="admin-grid">
+                            <div>
+                                <h3>🚫 Блокировка по нику</h3>
+                                <div class="block">
+                                    <input type="text" id="banNickInput" placeholder="Введите ник" />
+                                    <input type="text" id="banReasonInput" placeholder="Причина (необязательно)" />
+                                    <button class="admin-btn-ban" onclick="banByNick()">🚫 Заблокировать</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h3>🚫 Блокировка по Discord</h3>
+                                <div class="block">
+                                    <input type="text" id="banDiscordInput" placeholder="Введите Discord" />
+                                    <input type="text" id="banReasonInput2" placeholder="Причина (необязательно)" />
+                                    <button class="admin-btn-ban" onclick="banByDiscord()">🚫 Заблокировать</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
+                            <div id="bannedList" class="banned-list-container"></div>
+                            <button class="admin-btn-clear" onclick="clearAllBans()">🗑️ Очистить весь список</button>
+                        </div>
+
+                        <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
+                            <p>🔒 Блокировка работает по отпечатку браузера (fingerprint), нику и Discord ID.</p>
+                            <p>💡 Заблокированный пользователь не сможет оформить заказ.</p>
+                            <p>📌 Ваш ID: <span id="userIdDisplay2" style="color:#8bc34a;">загрузка...</span></p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <!-- /content-area -->
 
@@ -1211,7 +1429,7 @@
 
     <script>
         // ============================================
-        //  WEBHOOK URL — ВСТАВЬ СВОЙ
+        //  WEBHOOK URL
         // ============================================
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1527419218478366772/q64IVjbp58-XzGQNbJedo8dzEtAX54X15bV7TTZfv67AVHjC4iHpQFliiMmJ2fa_rhPv';
 
@@ -1495,28 +1713,349 @@
         }
 
         // ============================================
-        //  НАВИГАЦИЯ
+        //  НАВИГАЦИЯ (ОСНОВНАЯ)
         // ============================================
         const navLinks = document.querySelectorAll('.nav-link');
         const pages = {
             info: document.getElementById('page-info'),
             news: document.getElementById('page-news'),
             support: document.getElementById('page-support'),
-            shop: document.getElementById('page-shop')
+            shop: document.getElementById('page-shop'),
+            admin: document.getElementById('adminPanel')
         };
+
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 const page = this.dataset.page;
                 Object.keys(pages).forEach(key => {
-                    pages[key].classList.remove('active');
+                    if (pages[key]) {
+                        pages[key].classList.remove('active');
+                        pages[key].style.display = 'none';
+                    }
                 });
-                pages[page].classList.add('active');
+                if (pages[page]) {
+                    pages[page].classList.add('active');
+                    pages[page].style.display = 'block';
+                }
                 if (page === 'shop') {
                     filterItems('all');
                 }
             });
+        });
+
+        // ============================================
+        //  СИСТЕМА БАНА (FINGERPRINT + DISCORD + НИК)
+        // ============================================
+
+        // 1. Генерация fingerprint
+        function getBrowserFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(10, 10, 50, 30);
+                ctx.fillStyle = '#069';
+                ctx.fillText('Нюхач', 20, 20);
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('Shop', 80, 20);
+
+                const fingerprintData = {
+                    canvas: canvas.toDataURL(),
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screen: `${screen.width}x${screen.height}`,
+                    colorDepth: screen.colorDepth,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    touch: 'ontouchstart' in window,
+                    hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
+                };
+
+                let hash = 0;
+                const str = JSON.stringify(fingerprintData);
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return 'fp_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36).slice(-4);
+            } catch (e) {
+                return 'fp_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+            }
+        }
+
+        // 2. Получение ID пользователя
+        function getUserId() {
+            let id = localStorage.getItem('userId');
+            if (!id) {
+                id = sessionStorage.getItem('userId');
+            }
+            if (!id) {
+                id = getBrowserFingerprint();
+                localStorage.setItem('userId', id);
+                sessionStorage.setItem('userId', id);
+                document.cookie = `userId=${id}; path=/; max-age=31536000`;
+            }
+            return id;
+        }
+
+        const userId = getUserId();
+
+        // 3. Список заблокированных
+        let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
+
+        function saveBannedUsers() {
+            localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+        }
+
+        function isUserBanned() {
+            // Проверка по fingerprint
+            const fingerprintBanned = bannedUsers.some(user => user.id === userId);
+            if (fingerprintBanned) return true;
+
+            // Проверка по Discord
+            const discord = document.getElementById('playerDiscord')?.value?.trim();
+            if (discord) {
+                const discordBanned = bannedUsers.some(user =>
+                    user.discord && user.discord.toLowerCase() === discord.toLowerCase()
+                );
+                if (discordBanned) return true;
+            }
+
+            // Проверка по нику
+            const nick = document.getElementById('playerNick')?.value?.trim();
+            if (nick) {
+                const nickBanned = bannedUsers.some(user =>
+                    user.nick && user.nick.toLowerCase() === nick.toLowerCase()
+                );
+                if (nickBanned) return true;
+            }
+
+            return false;
+        }
+
+        // 4. Функции бана
+        function banUser(nick = '', discord = '', reason = 'Нарушение правил') {
+            const bannedItem = {
+                id: userId,
+                timestamp: new Date().toISOString(),
+                reason: reason
+            };
+            if (nick && nick.trim()) {
+                bannedItem.nick = nick.trim();
+            }
+            if (discord && discord.trim()) {
+                bannedItem.discord = discord.trim();
+            }
+
+            const exists = bannedUsers.some(user =>
+                (user.id === userId) ||
+                (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) ||
+                (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase())
+            );
+
+            if (!exists) {
+                bannedUsers.push(bannedItem);
+                saveBannedUsers();
+                renderBannedList();
+                alert(`✅ Пользователь заблокирован!\nПричина: ${reason}`);
+                return true;
+            } else {
+                alert(`⚠️ Этот пользователь уже в чёрном списке.`);
+                return false;
+            }
+        }
+
+        function banByNick() {
+            const nick = document.getElementById('banNickInput')?.value?.trim();
+            const reason = document.getElementById('banReasonInput')?.value?.trim() || 'Нарушение правил';
+            if (!nick) {
+                alert('Введите ник для блокировки!');
+                return;
+            }
+            banUser(nick, '', reason);
+            document.getElementById('banNickInput').value = '';
+            document.getElementById('banReasonInput').value = '';
+        }
+
+        function banByDiscord() {
+            const discord = document.getElementById('banDiscordInput')?.value?.trim();
+            const reason = document.getElementById('banReasonInput2')?.value?.trim() || 'Нарушение правил';
+            if (!discord) {
+                alert('Введите Discord для блокировки!');
+                return;
+            }
+            banUser('', discord, reason);
+            document.getElementById('banDiscordInput').value = '';
+            document.getElementById('banReasonInput2').value = '';
+        }
+
+        function banCurrentUser() {
+            const nick = document.getElementById('playerNick')?.value?.trim() || 'Неизвестный';
+            const discord = document.getElementById('playerDiscord')?.value?.trim() || '';
+            const reason = 'Нарушение правил';
+            if (confirm(`Заблокировать текущего пользователя?\nНик: ${nick}\nDiscord: ${discord || 'Не указан'}`)) {
+                banUser(nick, discord, reason);
+            }
+        }
+
+        // 5. Функции разблокировки
+        function unbanUser(index) {
+            if (index >= 0 && index < bannedUsers.length) {
+                const user = bannedUsers[index];
+                const displayName = user.nick || user.discord || user.id;
+                if (confirm(`Разблокировать пользователя "${displayName}"?`)) {
+                    bannedUsers.splice(index, 1);
+                    saveBannedUsers();
+                    renderBannedList();
+                    alert(`✅ Пользователь разблокирован!`);
+                }
+            }
+        }
+
+        function clearAllBans() {
+            if (bannedUsers.length === 0) {
+                alert('📭 Чёрный список уже пуст.');
+                return;
+            }
+            if (confirm('⚠️ ВЫ УВЕРЕНЫ? Это разблокирует всех пользователей!')) {
+                bannedUsers = [];
+                saveBannedUsers();
+                renderBannedList();
+                alert('✅ Все пользователи разблокированы!');
+            }
+        }
+
+        // 6. Отображение списка заблокированных
+        function renderBannedList() {
+            const container = document.getElementById('bannedList');
+            if (!container) return;
+
+            if (bannedUsers.length === 0) {
+                container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">📭 Чёрный список пуст</div>';
+                return;
+            }
+
+            let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+            bannedUsers.forEach((user, index) => {
+                const displayName = user.nick || user.discord || user.id;
+                const details = [];
+                if (user.nick) details.push(`Ник: ${user.nick}`);
+                if (user.discord) details.push(`Discord: ${user.discord}`);
+                if (user.reason) details.push(`Причина: ${user.reason}`);
+
+                html += `
+                    <div class="banned-item">
+                        <div class="info">
+                            <div class="nick">🚫 ${displayName}</div>
+                            <div class="details">${details.join(' · ')}</div>
+                        </div>
+                        <div class="actions">
+                            <button onclick="unbanUser(${index})">Разблокировать</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        //  СКРЫТАЯ АДМИН-ПАНЕЛЬ
+        // ============================================
+
+        // Функция добавления кнопки админки
+        function showAdminButton() {
+            const navMenu = document.getElementById('navMenu');
+            if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
+                const adminBtn = document.createElement('button');
+                adminBtn.className = 'nav-link';
+                adminBtn.dataset.page = 'admin';
+                adminBtn.textContent = '⚙️ Админ';
+                adminBtn.style.color = '#ff6a6a';
+                navMenu.appendChild(adminBtn);
+
+                adminBtn.addEventListener('click', function() {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    const page = 'admin';
+                    Object.keys(pages).forEach(key => {
+                        if (pages[key]) {
+                            pages[key].classList.remove('active');
+                            pages[key].style.display = 'none';
+                        }
+                    });
+                    if (pages[page]) {
+                        pages[page].classList.add('active');
+                        pages[page].style.display = 'block';
+                    }
+                    // Обновляем ID в админке
+                    document.getElementById('userIdDisplay').textContent = userId;
+                    document.getElementById('userIdDisplay2').textContent = userId;
+                    renderBannedList();
+                });
+            }
+        }
+
+        // 1. Двойной клик по заголовку
+        const siteTitle = document.getElementById('siteTitle');
+        if (siteTitle) {
+            let clickCount = 0;
+            let clickTimer = null;
+            siteTitle.addEventListener('click', function() {
+                clickCount++;
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+                if (clickCount >= 2) {
+                    clickCount = 0;
+                    clearTimeout(clickTimer);
+                    showAdminButton();
+                    document.querySelector('.nav-link[data-page="admin"]')?.click();
+                }
+            });
+            siteTitle.title = 'Двойной клик — админ-панель';
+        }
+
+        // 2. Секретная ссылка (?admin=nyuhach2026)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'nyuhach2026') {
+            setTimeout(() => {
+                showAdminButton();
+                document.querySelector('.nav-link[data-page="admin"]')?.click();
+            }, 500);
+        }
+
+        // 3. Комбинация клавиш Ctrl+Shift+A
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
+                e.preventDefault();
+                showAdminButton();
+                document.querySelector('.nav-link[data-page="admin"]')?.click();
+            }
+        });
+
+        // 4. Скрыть админ-панель Ctrl+Shift+H
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
+                e.preventDefault();
+                const adminBtn = document.querySelector('.nav-link[data-page="admin"]');
+                if (adminBtn) {
+                    adminBtn.remove();
+                }
+                const adminPanel = document.getElementById('adminPanel');
+                if (adminPanel) {
+                    adminPanel.classList.remove('active');
+                    adminPanel.style.display = 'none';
+                }
+                document.querySelector('.nav-link[data-page="info"]')?.click();
+                alert('🔒 Админ-панель скрыта');
+            }
         });
 
         // ============================================
@@ -1633,7 +2172,7 @@
         });
 
         // ============================================
-        //  ОТПРАВКА ЗАЯВКИ ЧЕРЕЗ WEBHOOK
+        //  ОТПРАВКА ЗАЯВКИ (С ПРОВЕРКОЙ БАНА)
         // ============================================
         submitApplicationBtn.addEventListener('click', async function() {
             const nick = document.getElementById('playerNick').value.trim();
@@ -1643,6 +2182,12 @@
 
             if (!nick || !discord || !pzv || !item) {
                 alert('Пожалуйста, заполните все поля формы!');
+                return;
+            }
+
+            // ★★★ ПРОВЕРКА НА БАН ★★★
+            if (isUserBanned()) {
+                alert('🚫 ВАС ЗАБЛОКИРОВАЛИ!\n\nВы не можете оформлять заказы.\nЕсли вы считаете, что это ошибка — обратитесь к администрации.');
                 return;
             }
 
@@ -1674,7 +2219,6 @@
                         renderCart();
                     }
                     closeModal();
-                    // Убрана ссылка на Telegram
                 } else {
                     alert('❌ Ошибка отправки. Попробуйте ещё раз.');
                 }
@@ -1719,460 +2263,19 @@
         filterItems('all');
         updateCartUI();
 
-        console.log('✅ Сайт готов! Заявки отправляются через Webhook.');
+        // Обновляем ID в админке
+        document.getElementById('userIdDisplay').textContent = userId;
+        document.getElementById('userIdDisplay2').textContent = userId;
+
+        console.log('✅ Сайт готов!');
+        console.log('🕵️ Админ-панель скрыта!');
+        console.log('🔑 Способы открытия:');
+        console.log('  • Двойной клик по названию сайта');
+        console.log('  • Ссылка: ?admin=nyuhach2026');
+        console.log('  • Клавиши: Ctrl+Shift+A');
+        console.log('🔒 Скрыть: Ctrl+Shift+H');
         console.log('📍 Webhook URL:', WEBHOOK_URL);
-        // ============================================
-//  СИСТЕМА БАНА: FINGERPRINT + DISCORD
-//  (надёжно, законно, сложно обойти)
-// ============================================
-
-// --------------------------------------------
-//  1. ГЕНЕРАЦИЯ FINGERPRINT
-// --------------------------------------------
-function getBrowserFingerprint() {
-    try {
-        // Рисуем на canvas для уникальности
-        const canvas = document.createElement('canvas');
-        canvas.width = 256;
-        canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.fillStyle = '#f60';
-        ctx.fillRect(10, 10, 50, 30);
-        ctx.fillStyle = '#069';
-        ctx.fillText('Нюхач', 20, 20);
-        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-        ctx.fillText('Shop', 80, 20);
-        
-        // Собираем уникальные характеристики
-        const fingerprintData = {
-            canvas: canvas.toDataURL(),
-            userAgent: navigator.userAgent,
-            language: navigator.language,
-            platform: navigator.platform,
-            screen: `${screen.width}x${screen.height}`,
-            colorDepth: screen.colorDepth,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            touch: 'ontouchstart' in window,
-            hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
-        };
-        
-        // Хешируем в короткую строку
-        let hash = 0;
-        const str = JSON.stringify(fingerprintData);
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return 'fp_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36).slice(-4);
-    } catch (e) {
-        // Если что-то пошло не так — создаём простой ID
-        return 'fp_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
-    }
-}
-
-// --------------------------------------------
-//  2. ХРАНЕНИЕ И ПОЛУЧЕНИЕ ID ПОЛЬЗОВАТЕЛЯ
-// --------------------------------------------
-function getUserId() {
-    // Пытаемся получить из нескольких мест
-    let id = localStorage.getItem('userId');
-    if (!id) {
-        id = sessionStorage.getItem('userId');
-    }
-    if (!id) {
-        id = getBrowserFingerprint();
-        // Сохраняем во все места для надёжности
-        localStorage.setItem('userId', id);
-        sessionStorage.setItem('userId', id);
-        // Сохраняем в cookie (на случай очистки localStorage)
-        document.cookie = `userId=${id}; path=/; max-age=31536000`;
-    }
-    return id;
-}
-
-// Получаем ID пользователя при загрузке
-const userId = getUserId();
-
-// --------------------------------------------
-//  3. ХРАНЕНИЕ СПИСКА ЗАБЛОКИРОВАННЫХ
-// --------------------------------------------
-let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
-
-function saveBannedUsers() {
-    localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
-}
-
-// Проверка: заблокирован ли текущий пользователь
-function isUserBanned() {
-    // Проверяем по fingerprint
-    const fingerprintBanned = bannedUsers.some(user => user.id === userId);
-    if (fingerprintBanned) return true;
-    
-    // Проверяем по Discord (если есть)
-    const discord = document.getElementById('playerDiscord')?.value?.trim();
-    if (discord) {
-        const discordBanned = bannedUsers.some(user => 
-            user.discord && user.discord.toLowerCase() === discord.toLowerCase()
-        );
-        if (discordBanned) return true;
-    }
-    
-    // Проверяем по нику (дополнительный уровень)
-    const nick = document.getElementById('playerNick')?.value?.trim();
-    if (nick) {
-        const nickBanned = bannedUsers.some(user => 
-            user.nick && user.nick.toLowerCase() === nick.toLowerCase()
-        );
-        if (nickBanned) return true;
-    }
-    
-    return false;
-}
-
-// Проверка для конкретного пользователя (для админ-панели)
-function isSpecificUserBanned(nick, discord) {
-    return bannedUsers.some(user => {
-        if (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) return true;
-        if (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase()) return true;
-        return false;
-    });
-}
-
-// --------------------------------------------
-//  4. ФУНКЦИИ БАНА
-// --------------------------------------------
-function banUser(nick = '', discord = '', reason = 'Нарушение правил') {
-    // Если блокируем по нику — блокируем по самому нику и по fingerprint текущего пользователя
-    const bannedItem = {
-        id: userId,
-        timestamp: new Date().toISOString(),
-        reason: reason
-    };
-    
-    if (nick && nick.trim()) {
-        bannedItem.nick = nick.trim();
-    }
-    if (discord && discord.trim()) {
-        bannedItem.discord = discord.trim();
-    }
-    
-    // Проверяем, есть ли уже такой пользователь
-    const exists = bannedUsers.some(user => 
-        (user.id === userId) ||
-        (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) ||
-        (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase())
-    );
-    
-    if (!exists) {
-        bannedUsers.push(bannedItem);
-        saveBannedUsers();
-        renderBannedList();
-        alert(`✅ Пользователь заблокирован!\nПричина: ${reason}`);
-        return true;
-    } else {
-        alert(`⚠️ Этот пользователь уже в чёрном списке.`);
-        return false;
-    }
-}
-
-// Блокировка по нику (из админ-панели)
-function banByNick() {
-    const nick = document.getElementById('banNickInput')?.value?.trim();
-    const reason = document.getElementById('banReasonInput')?.value?.trim() || 'Нарушение правил';
-    if (!nick) {
-        alert('Введите ник для блокировки!');
-        return;
-    }
-    // Ищем пользователя с таким ником в системе
-    // Используем текущий fingerprint для блокировки
-    banUser(nick, '', reason);
-    if (document.getElementById('banNickInput')) {
-        document.getElementById('banNickInput').value = '';
-        document.getElementById('banReasonInput').value = '';
-    }
-}
-
-// Блокировка по Discord
-function banByDiscord() {
-    const discord = document.getElementById('banDiscordInput')?.value?.trim();
-    const reason = document.getElementById('banReasonInput2')?.value?.trim() || 'Нарушение правил';
-    if (!discord) {
-        alert('Введите Discord для блокировки!');
-        return;
-    }
-    banUser('', discord, reason);
-    if (document.getElementById('banDiscordInput')) {
-        document.getElementById('banDiscordInput').value = '';
-        document.getElementById('banReasonInput2').value = '';
-    }
-}
-
-// Блокировка текущего пользователя
-function banCurrentUser() {
-    const nick = document.getElementById('playerNick')?.value?.trim() || 'Неизвестный';
-    const discord = document.getElementById('playerDiscord')?.value?.trim() || '';
-    const reason = 'Нарушение правил';
-    if (confirm(`Заблокировать текущего пользователя?\nНик: ${nick}\nDiscord: ${discord || 'Не указан'}`)) {
-        banUser(nick, discord, reason);
-    }
-}
-
-// --------------------------------------------
-//  5. ФУНКЦИИ РАЗБЛОКИРОВКИ
-// --------------------------------------------
-function unbanUser(index) {
-    if (index >= 0 && index < bannedUsers.length) {
-        const user = bannedUsers[index];
-        const displayName = user.nick || user.discord || user.id;
-        if (confirm(`Разблокировать пользователя "${displayName}"?`)) {
-            bannedUsers.splice(index, 1);
-            saveBannedUsers();
-            renderBannedList();
-            alert(`✅ Пользователь разблокирован!`);
-        }
-    }
-}
-
-function clearAllBans() {
-    if (bannedUsers.length === 0) {
-        alert('📭 Чёрный список уже пуст.');
-        return;
-    }
-    if (confirm('⚠️ ВЫ УВЕРЕНЫ? Это разблокирует всех пользователей!')) {
-        bannedUsers = [];
-        saveBannedUsers();
-        renderBannedList();
-        alert('✅ Все пользователи разблокированы!');
-    }
-}
-
-// --------------------------------------------
-//  6. ОТОБРАЖЕНИЕ СПИСКА ЗАБЛОКИРОВАННЫХ
-// --------------------------------------------
-function renderBannedList() {
-    const container = document.getElementById('bannedList');
-    if (!container) return;
-    
-    if (bannedUsers.length === 0) {
-        container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">📭 Чёрный список пуст</div>';
-        return;
-    }
-    
-    let html = '<div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;">';
-    bannedUsers.forEach((user, index) => {
-        const displayName = user.nick || user.discord || user.id;
-        const details = [];
-        if (user.nick) details.push(`Ник: ${user.nick}`);
-        if (user.discord) details.push(`Discord: ${user.discord}`);
-        if (user.reason) details.push(`Причина: ${user.reason}`);
-        
-        html += `
-            <div style="display:flex;justify-content:space-between;align-items:center;background:#162216;padding:8px 14px;border-radius:8px;border:1px solid #2a4a2a;flex-wrap:wrap;gap:8px;">
-                <div>
-                    <span style="color:#ff6a6a;font-weight:600;">🚫 ${displayName}</span>
-                    <div style="font-size:11px;color:#4a6a4a;margin-top:2px;">${details.join(' · ')}</div>
-                </div>
-                <div style="display:flex;gap:6px;">
-                    <button onclick="unbanUser(${index})" style="background:#4a2a2a;color:#c86a6a;border:1px solid #5a3a3a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">Разблокировать</button>
-                </div>
-            </div>
-        `;
-    });
-    html += '</div>';
-    html += `
-        <div style="margin-top:12px;">
-            <button onclick="clearAllBans()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:6px 20px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">🗑️ Очистить весь список</button>
-        </div>
-    `;
-    container.innerHTML = html;
-}
-
-// --------------------------------------------
-//  7. АДМИН-ПАНЕЛЬ
-// --------------------------------------------
-function initAdminPanel() {
-    const navMenu = document.querySelector('.nav-menu');
-    if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
-        const adminBtn = document.createElement('button');
-        adminBtn.className = 'nav-link';
-        adminBtn.dataset.page = 'admin';
-        adminBtn.textContent = '⚙️ Админ';
-        adminBtn.style.color = '#ff6a6a';
-        navMenu.appendChild(adminBtn);
-        adminBtn.addEventListener('click', function() {
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            showAdminPanel();
-        });
-    }
-}
-
-function showAdminPanel() {
-    let adminContainer = document.getElementById('adminPanel');
-    if (!adminContainer) {
-        adminContainer = document.createElement('div');
-        adminContainer.id = 'adminPanel';
-        adminContainer.className = 'page-content';
-        document.querySelector('.content-area').appendChild(adminContainer);
-    }
-    
-    document.querySelectorAll('.page-content').forEach(p => {
-        if (p.id !== 'adminPanel') p.classList.remove('active');
-    });
-    adminContainer.classList.add('active');
-    adminContainer.style.display = 'block';
-    
-    // Получаем ник и Discord из формы (если есть)
-    const currentNick = document.getElementById('playerNick')?.value?.trim() || 'Не указан';
-    const currentDiscord = document.getElementById('playerDiscord')?.value?.trim() || 'Не указан';
-    
-    adminContainer.innerHTML = `
-        <div class="info-block" style="border-color:#6a3a3a;">
-            <h2 style="color:#ff6a6a;">⚙️ Админ-панель</h2>
-            
-            <div style="margin-bottom:20px;padding:10px 14px;background:#162216;border-radius:8px;border:1px solid #2a4a2a;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                    <div>
-                        <span style="color:#4a6a4a;font-size:13px;">🔑 Ваш ID:</span>
-                        <span style="color:#8bc34a;font-weight:600;font-size:13px;word-break:break-all;">${userId}</span>
-                    </div>
-                    <button onclick="banCurrentUser()" style="background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">🚫 Заблокировать текущего</button>
-                </div>
-            </div>
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-                <div>
-                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Блокировка по нику</h3>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <input type="text" id="banNickInput" placeholder="Введите ник" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                        <input type="text" id="banReasonInput" placeholder="Причина (необязательно)" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                        <button onclick="banByNick()" style="padding:8px 16px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Блокировка по Discord</h3>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <input type="text" id="banDiscordInput" placeholder="Введите Discord" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                        <input type="text" id="banReasonInput2" placeholder="Причина (необязательно)" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                        <button onclick="banByDiscord()" style="padding:8px 16px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
-                <div id="bannedList"></div>
-            </div>
-            
-            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
-                <p>🔒 Блокировка работает по отпечатку браузера (fingerprint), нику и Discord ID.</p>
-                <p>💡 Заблокированный пользователь не сможет оформить заказ.</p>
-                <p>📌 Ваш ID: <span style="color:#8bc34a;">${userId}</span></p>
-            </div>
-        </div>
-    `;
-    renderBannedList();
-}
-
-// --------------------------------------------
-//  8. ИНИЦИАЛИЗАЦИЯ
-// --------------------------------------------
-// Добавляем админ-панель в меню
-document.addEventListener('DOMContentLoaded', function() {
-    initAdminPanel();
-});
-
-console.log('✅ Система бана (fingerprint + Discord) загружена!');
-console.log('🔑 Ваш ID:', userId);
-        // ============================================
-//  СКРЫТАЯ АДМИН-ПАНЕЛЬ (комбинированный способ)
-// ============================================
-
-// Функция показа кнопки админки
-function showAdminButton() {
-    const navMenu = document.querySelector('.nav-menu');
-    if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
-        const adminBtn = document.createElement('button');
-        adminBtn.className = 'nav-link';
-        adminBtn.dataset.page = 'admin';
-        adminBtn.textContent = '⚙️ Админ';
-        adminBtn.style.color = '#ff6a6a';
-        navMenu.appendChild(adminBtn);
-        
-        adminBtn.addEventListener('click', function() {
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            showAdminPanel();
-        });
-    }
-}
-
-// 1. ДВОЙНОЙ КЛИК ПО ЗАГОЛОВКУ
-const siteTitle = document.querySelector('.header-top h1');
-if (siteTitle) {
-    let clickCount = 0;
-    let clickTimer = null;
-    siteTitle.addEventListener('click', function() {
-        clickCount++;
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-        if (clickCount >= 2) {
-            clickCount = 0;
-            clearTimeout(clickTimer);
-            showAdminButton();
-            document.querySelector('.nav-link[data-page="admin"]')?.click();
-        }
-    });
-    siteTitle.title = 'Двойной клик — админ-панель';
-    siteTitle.style.cursor = 'pointer';
-}
-
-// 2. СЕКРЕТНАЯ ССЫЛКА (?admin=nyuhach2026)
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('admin') === 'nyuhach2026') {
-    setTimeout(() => {
-        showAdminButton();
-        document.querySelector('.nav-link[data-page="admin"]')?.click();
-    }, 500);
-}
-
-// 3. КОМБИНАЦИЯ КЛАВИШ (Ctrl+Shift+A)
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
-        e.preventDefault();
-        showAdminButton();
-        document.querySelector('.nav-link[data-page="admin"]')?.click();
-    }
-});
-
-// 4. СКРЫТЬ АДМИН-ПАНЕЛЬ (Ctrl+Shift+H)
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
-        e.preventDefault();
-        const adminBtn = document.querySelector('.nav-link[data-page="admin"]');
-        if (adminBtn) {
-            adminBtn.remove();
-        }
-        const adminPanel = document.getElementById('adminPanel');
-        if (adminPanel) {
-            adminPanel.style.display = 'none';
-            adminPanel.classList.remove('active');
-        }
-        // Возвращаемся на главную
-        document.querySelector('.nav-link[data-page="info"]')?.click();
-        alert('🔒 Админ-панель скрыта');
-    }
-});
-
-console.log('🕵️ Админ-панель скрыта!');
-console.log('🔑 Способы открытия:');
-console.log('  • Двойной клик по названию сайта');
-console.log('  • Ссылка: ?admin=nyuhach2026');
-console.log('  • Клавиши: Ctrl+Shift+A');
-console.log('🔒 Скрыть: Ctrl+Shift+H');
+        console.log('🔑 Ваш ID:', userId);
     </script>
 
 </body>

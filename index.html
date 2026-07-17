@@ -1305,34 +1305,6 @@
             color: #4a6a4a;
             font-size: 12px;
         }
-
-        /* ===== ВКЛАДКИ В АДМИНКЕ ===== */
-        .tab-content-inner {
-            display: none;
-        }
-        .tab-content-inner.active {
-            display: block;
-        }
-        .tab-btn {
-            padding: 8px 20px;
-            background: #1a2a2a;
-            color: #6a8a6a;
-            border: 1px solid #2a3a2a;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .tab-btn:hover {
-            background: #2a3a2a;
-            color: #8bc34a;
-        }
-        .tab-btn.active {
-            background: #2a4a2a;
-            color: #8bc34a;
-            border-color: #3a5a3a;
-        }
     </style>
 </head>
 <body>
@@ -1441,69 +1413,35 @@
                     <div class="grid" id="itemsGrid"></div>
                 </div>
 
-                <!-- АДМИН-ПАНЕЛЬ -->
+                <!-- АДМИН-ПАНЕЛЬ (УПРОЩЁННАЯ) -->
                 <div class="page-content" id="adminPanel">
                     <div class="info-block" style="border-color:#6a3a3a;">
-                        <h2 style="color:#ff6a6a;">Админ-панель</h2>
-
-                        <div class="admin-current-user">
-                            <div>
-                                <span class="label">Ваш ID:</span>
-                                <span class="id" id="userIdDisplay">загрузка...</span>
-                            </div>
-                            <button class="btn-ban-self" onclick="banCurrentUser()">Заблокировать текущего</button>
+                        <h2 style="color:#ff6a6a;">⚙️ Админ-панель</h2>
+                        
+                        <div style="margin-bottom:16px;padding:10px 14px;background:#162216;border-radius:8px;border:1px solid #2a4a2a;">
+                            <span style="color:#4a6a4a;">Ваш ID:</span>
+                            <span style="color:#8bc34a;font-weight:600;" id="adminUserIdDisplay">загрузка...</span>
                         </div>
-
-                        <!-- ВКЛАДКИ -->
-                        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-                            <button class="tab-btn active" onclick="switchAdminTab('admins')" id="tabAdmins">Администраторы</button>
-                            <button class="tab-btn" onclick="switchAdminTab('users')" id="tabUsers">Пользователи</button>
-                            <button class="tab-btn" onclick="switchAdminTab('bans')" id="tabBans">Баны</button>
-                        </div>
-
-                        <!-- Содержимое вкладок -->
-                        <div id="tabContentAdmins" class="tab-content-inner active">
-                            <div style="margin-bottom:16px;padding:12px;background:#162216;border-radius:10px;border:1px solid #2a4a2a;">
-                                <div class="admin-list-header">Управление администраторами</div>
-                                <div class="admin-add-section">
-                                    <input type="text" id="addAdminByIdInput" placeholder="Fingerprint ID" style="flex:1;min-width:200px;padding:8px 12px;background:#1a2a1a;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <button onclick="addAdminById()" style="padding:8px 20px;background:#2a4a2a;color:#8bc34a;border:1px solid #3a5a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Добавить по ID</button>
-                                </div>
-                                <div id="adminListContainer" class="admin-list-container"></div>
-                                <div style="margin-top:8px;color:#3a4a3a;font-size:11px;">Доступ только для администраторов</div>
+                        
+                        <!-- БЛОКИРОВКА ПО ID -->
+                        <div style="margin-bottom:16px;">
+                            <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Заблокировать пользователя</h3>
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                <input type="text" id="banUserIdInput" placeholder="Fingerprint ID" style="flex:2;min-width:200px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                                <button onclick="banUserById()" style="padding:8px 20px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Заблокировать</button>
                             </div>
                         </div>
-
-                        <div id="tabContentUsers" class="tab-content-inner">
-                            <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-                                <span style="color:#4a6a4a;">Всего посетителей: <span id="userLogCount" style="color:#8bc34a;font-weight:600;">0</span></span>
-                                <button onclick="clearUserLog()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:12px;">Очистить лог</button>
-                            </div>
-                            <div id="userLogContainer" class="user-log-container"></div>
+                        
+                        <!-- ЧЁРНЫЙ СПИСОК -->
+                        <div>
+                            <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Чёрный список</h3>
+                            <div id="bannedListSimple" style="max-height:300px;overflow-y:auto;"></div>
+                            <button onclick="clearAllBansSimple()" style="margin-top:8px;background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:6px 20px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">Очистить все баны</button>
                         </div>
-
-                        <div id="tabContentBans" class="tab-content-inner">
-                            <div>
-                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Черный список</h3>
-                                <div id="bannedList" class="banned-list-container"></div>
-                                <button class="admin-btn-clear" onclick="clearAllBans()">Очистить весь список</button>
-                            </div>
-                            <div style="margin-top:12px;">
-                                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">Добавить вручную</h3>
-                                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                                    <input type="text" id="manualBanId" placeholder="Fingerprint ID" style="flex:2;min-width:200px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <input type="text" id="manualBanReason" placeholder="Причина" style="flex:1;min-width:120px;padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
-                                    <button onclick="banById(document.getElementById('manualBanId').value, document.getElementById('manualBanReason').value || 'Нарушение правил');document.getElementById('manualBanId').value='';document.getElementById('manualBanReason').value='';" style="padding:8px 20px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">Заблокировать</button>
-                                </div>
-                                <div style="margin-top:8px;color:#4a6a4a;font-size:12px;">
-                                    Вставьте ID из лога пользователей (начинается с fp_)
-                                </div>
-                            </div>
-                        </div>
-
+                        
                         <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
-                            <p>Ваш ID: <span id="userIdDisplay2" style="color:#8bc34a;">загрузка...</span></p>
-                            <p>Блокировка работает по отпечатку браузера (fingerprint)</p>
+                            <p>Для блокировки нужен Fingerprint ID пользователя</p>
+                            <p>Ваш ID: <span id="adminUserIdDisplay2" style="color:#8bc34a;">загрузка...</span></p>
                         </div>
                     </div>
                 </div>
@@ -1893,8 +1831,10 @@
         });
 
         // ============================================
-        //  СИСТЕМА БАНА
+        //  СИСТЕМА БАНА (ТОЛЬКО ID)
         // ============================================
+
+        // Генерация fingerprint
         function getBrowserFingerprint() {
             try {
                 const canvas = document.createElement('canvas');
@@ -1951,151 +1891,95 @@
 
         const userId = getUserId();
 
-       let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
+        // ★★★ СПИСОК ЗАБЛОКИРОВАННЫХ ID ★★★
+        // Добавляй сюда ID для блокировки
+        const BANNED_IDS = [
+            'fp_dkdxdz_tauw'   // ← Пример: заблокированный пользователь
+        ];
+
+        // Список заблокированных (для админ-панели)
+        let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
 
         function saveBannedUsers() {
             localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+            renderBannedListSimple();
         }
 
         function isUserBanned() {
-            const fingerprintBanned = bannedUsers.some(user => user.id === userId);
-            if (fingerprintBanned) return true;
-
-            const discord = document.getElementById('playerDiscord')?.value?.trim();
-            if (discord) {
-                const discordBanned = bannedUsers.some(user =>
-                    user.discord && user.discord.toLowerCase() === discord.toLowerCase()
-                );
-                if (discordBanned) return true;
-            }
-
-            const nick = document.getElementById('playerNick')?.value?.trim();
-            if (nick) {
-                const nickBanned = bannedUsers.some(user =>
-                    user.nick && user.nick.toLowerCase() === nick.toLowerCase()
-                );
-                if (nickBanned) return true;
-            }
-
-            return false;
-        }
-
-        function banUser(nick = '', discord = '', reason = 'Нарушение правил') {
-            const bannedItem = {
-                id: userId,
-                timestamp: new Date().toISOString(),
-                reason: reason
-            };
-            if (nick && nick.trim()) {
-                bannedItem.nick = nick.trim();
-            }
-            if (discord && discord.trim()) {
-                bannedItem.discord = discord.trim();
-            }
-
-            const exists = bannedUsers.some(user =>
-                (user.id === userId) ||
-                (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) ||
-                (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase())
-            );
-
-            if (!exists) {
-                bannedUsers.push(bannedItem);
-                saveBannedUsers();
-                renderBannedList();
-                alert(`Пользователь заблокирован!\nПричина: ${reason}`);
+            // Проверка по списку BANNED_IDS
+            if (BANNED_IDS.includes(userId)) {
                 return true;
-            } else {
-                alert(`Этот пользователь уже в чёрном списке.`);
-                return false;
             }
+            // Проверка по списку из localStorage
+            return bannedUsers.some(user => user.id === userId);
         }
 
-        function banByNick() {
-            const nick = document.getElementById('banNickInput')?.value?.trim();
-            const reason = document.getElementById('banReasonInput')?.value?.trim() || 'Нарушение правил';
-            if (!nick) {
-                alert('Введите ник для блокировки!');
+        // ============================================
+        //  АДМИН-ПАНЕЛЬ (УПРОЩЁННАЯ)
+        // ============================================
+
+        function banUserById() {
+            const idInput = document.getElementById('banUserIdInput');
+            if (!idInput) return;
+            const id = idInput.value.trim();
+            if (!id) {
+                alert('Введите ID пользователя!');
                 return;
             }
-            banUser(nick, '', reason);
-            document.getElementById('banNickInput').value = '';
-            document.getElementById('banReasonInput').value = '';
-        }
-
-        function banByDiscord() {
-            const discord = document.getElementById('banDiscordInput')?.value?.trim();
-            const reason = document.getElementById('banReasonInput2')?.value?.trim() || 'Нарушение правил';
-            if (!discord) {
-                alert('Введите Discord для блокировки!');
+            if (bannedUsers.some(u => u.id === id)) {
+                alert('Этот пользователь уже заблокирован!');
                 return;
             }
-            banUser('', discord, reason);
-            document.getElementById('banDiscordInput').value = '';
-            document.getElementById('banReasonInput2').value = '';
+            bannedUsers.push({
+                id: id,
+                reason: 'Нарушение правил',
+                timestamp: new Date().toISOString()
+            });
+            saveBannedUsers();
+            idInput.value = '';
+            alert('✅ Пользователь заблокирован!');
         }
 
-        function banCurrentUser() {
-            const nick = document.getElementById('playerNick')?.value?.trim() || 'Неизвестный';
-            const discord = document.getElementById('playerDiscord')?.value?.trim() || '';
-            const reason = 'Нарушение правил';
-            if (confirm(`Заблокировать текущего пользователя?\nНик: ${nick}\nDiscord: ${discord || 'Не указан'}`)) {
-                banUser(nick, discord, reason);
-            }
-        }
-
-        function unbanUser(index) {
-            if (index >= 0 && index < bannedUsers.length) {
-                const user = bannedUsers[index];
-                const displayName = user.nick || user.discord || user.id;
-                if (confirm(`Разблокировать пользователя "${displayName}"?`)) {
-                    bannedUsers.splice(index, 1);
-                    saveBannedUsers();
-                    renderBannedList();
-                    alert(`Пользователь разблокирован!`);
-                }
-            }
-        }
-
-        function clearAllBans() {
+        function clearAllBansSimple() {
             if (bannedUsers.length === 0) {
                 alert('Чёрный список уже пуст.');
                 return;
             }
-            if (confirm('ВЫ УВЕРЕНЫ? Это разблокирует всех пользователей!')) {
+            if (confirm('Разблокировать всех пользователей?')) {
                 bannedUsers = [];
                 saveBannedUsers();
-                renderBannedList();
-                alert('Все пользователи разблокированы!');
+                alert('✅ Все пользователи разблокированы!');
             }
         }
 
-        function renderBannedList() {
-            const container = document.getElementById('bannedList');
-            if (!container) return;
+        function unbanUserSimple(index) {
+            if (index >= 0 && index < bannedUsers.length) {
+                if (confirm('Разблокировать пользователя?')) {
+                    bannedUsers.splice(index, 1);
+                    saveBannedUsers();
+                    alert('✅ Пользователь разблокирован!');
+                }
+            }
+        }
 
+        function renderBannedListSimple() {
+            const container = document.getElementById('bannedListSimple');
+            if (!container) return;
+            
             if (bannedUsers.length === 0) {
                 container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">Чёрный список пуст</div>';
                 return;
             }
-
+            
             let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
             bannedUsers.forEach((user, index) => {
-                const displayName = user.nick || user.discord || user.id;
-                const details = [];
-                if (user.nick) details.push(`Ник: ${user.nick}`);
-                if (user.discord) details.push(`Discord: ${user.discord}`);
-                if (user.reason) details.push(`Причина: ${user.reason}`);
-
                 html += `
-                    <div class="banned-item">
-                        <div class="info">
-                            <div class="nick">${displayName}</div>
-                            <div class="details">${details.join(' · ')}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:#162216;padding:8px 14px;border-radius:8px;border:1px solid #2a4a2a;">
+                        <div>
+                            <div style="color:#ff6a6a;font-weight:600;">${user.id}</div>
+                            <div style="font-size:11px;color:#4a6a4a;">${user.reason || 'Нарушение правил'}</div>
                         </div>
-                        <div class="actions">
-                            <button onclick="unbanUser(${index})">Разблокировать</button>
-                        </div>
+                        <button onclick="unbanUserSimple(${index})" style="background:#4a2a2a;color:#c86a6a;border:1px solid #5a3a3a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">Разблокировать</button>
                     </div>
                 `;
             });
@@ -2103,353 +1987,18 @@
             container.innerHTML = html;
         }
 
-        function banById(userIdToBan, reason = 'Нарушение правил') {
-            if (!userIdToBan || userIdToBan.trim() === '') {
-                alert('Введите ID пользователя!');
-                return;
-            }
-
-            const user = userLog.find(entry => entry.id === userIdToBan.trim());
-            if (!user) {
-                alert('Пользователь с таким ID не найден в логе!');
-                return;
-            }
-
-            if (bannedUsers.some(u => u.id === userIdToBan.trim())) {
-                alert('Этот пользователь уже заблокирован!');
-                return;
-            }
-
-            const bannedItem = {
-                id: userIdToBan.trim(),
-                nick: user.nick || 'Неизвестный',
-                discord: user.discord || 'Неизвестный',
-                reason: reason,
-                timestamp: new Date().toISOString()
-            };
-
-            bannedUsers.push(bannedItem);
-            saveBannedUsers();
-            renderBannedList();
-            renderUserLog();
-            alert(`Пользователь "${user.nick || user.id}" заблокирован!`);
-        }
-
         // ============================================
-        //  ЛОГИРОВАНИЕ ПОЛЬЗОВАТЕЛЕЙ
+        //  СИСТЕМА АДМИНИСТРАТОРОВ (ПРОСТАЯ)
         // ============================================
-        let userLog = JSON.parse(localStorage.getItem('userLog')) || [];
 
-        function logUserVisit() {
-            const nick = document.getElementById('playerNick')?.value?.trim() || 'Не указан';
-            const discord = document.getElementById('playerDiscord')?.value?.trim() || 'Не указан';
-
-            const existing = userLog.find(entry => entry.id === userId);
-            if (existing) {
-                existing.lastVisit = new Date().toISOString();
-                existing.nick = nick;
-                existing.discord = discord;
-                existing.visitCount = (existing.visitCount || 0) + 1;
-            } else {
-                userLog.push({
-                    id: userId,
-                    nick: nick,
-                    discord: discord,
-                    firstVisit: new Date().toISOString(),
-                    lastVisit: new Date().toISOString(),
-                    visitCount: 1,
-                    isBanned: isUserBanned()
-                });
-            }
-
-            localStorage.setItem('userLog', JSON.stringify(userLog));
-        }
-
-        logUserVisit();
-        document.getElementById('playerNick')?.addEventListener('change', logUserVisit);
-        document.getElementById('playerDiscord')?.addEventListener('change', logUserVisit);
-
-        function renderUserLog() {
-            const container = document.getElementById('userLogContainer');
-            if (!container) return;
-
-            if (userLog.length === 0) {
-                container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">Нет записей</div>';
-                document.getElementById('userLogCount').textContent = '0';
-                return;
-            }
-
-            document.getElementById('userLogCount').textContent = userLog.length;
-
-            const sorted = [...userLog].sort((a, b) => new Date(b.lastVisit) - new Date(a.lastVisit));
-
-            let html = '';
-            sorted.forEach((user) => {
-                const isBanned = bannedUsers.some(u => u.id === user.id);
-                const displayName = user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним');
-
-                html += `
-                    <div class="user-item">
-                        <div>
-                            <div class="name ${isBanned ? 'banned' : ''}">
-                                ${displayName}
-                                ${user.nick !== 'Не указан' ? `(${user.nick})` : ''}
-                            </div>
-                            <div class="details">
-                                ID: ${user.id.slice(0, 20)}... · Посещений: ${user.visitCount} · Последний визит: ${new Date(user.lastVisit).toLocaleString()}
-                            </div>
-                        </div>
-                        <div>
-                            ${isBanned ? `<span class="status-banned">Заблокирован</span>` : `<button onclick="banById('${user.id}','Нарушение правил')">Заблокировать</button>`}
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function clearUserLog() {
-            if (confirm('Очистить историю посещений?')) {
-                userLog = [];
-                localStorage.setItem('userLog', JSON.stringify(userLog));
-                renderUserLog();
-                alert('Лог очищен!');
-            }
-        }
-
-        // ============================================
-        //  СИСТЕМА АДМИНИСТРАТОРОВ (С ПРИНУДИТЕЛЬНЫМ СОХРАНЕНИЕМ)
-        // ============================================
-        let ADMIN_IDS = [];
-
-        // ★★★ ТВОЙ ID ★★★
         const MY_ID = 'fp_p1ktud_ufmt';
 
-        function loadAdminIds() {
-            const stored = localStorage.getItem('adminIds');
-            console.log('🔍 Читаем localStorage:', stored);
-            
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        ADMIN_IDS = parsed.map(id => id.trim());
-                        console.log('📋 Загружен список админов:', ADMIN_IDS);
-                        return;
-                    }
-                } catch (e) {
-                    console.log('Ошибка загрузки:', e);
-                }
-            }
-            
-            // Если ничего не загрузилось — создаём список с твоим ID
-            console.log('📋 Создаём новый список с твоим ID');
-            ADMIN_IDS = [MY_ID];
-            saveAdminIds();
-        }
-
-        function saveAdminIds() {
-            const data = JSON.stringify(ADMIN_IDS);
-            localStorage.setItem('adminIds', data);
-            console.log('💾 СОХРАНЕНО в localStorage:', data);
-            
-            // Проверяем, что сохранилось
-            const check = localStorage.getItem('adminIds');
-            if (check !== data) {
-                console.error('❌ ОШИБКА: данные не сохранились! Пробуем ещё раз...');
-                localStorage.setItem('adminIds', data);
-            }
-        }
-
         function isUserAdmin() {
-            const cleanUserId = userId.trim();
-            const isInList = ADMIN_IDS.some(id => id.trim() === cleanUserId);
-            if (isInList) {
-                console.log('🔍 Проверка ID:', cleanUserId, '→ ✅ есть в списке');
-                return true;
-            }
-            if (cleanUserId === MY_ID) {
-                console.log('🔍 Проверка ID:', cleanUserId, '→ 🔑 Это ТВОЙ ID! Добавляем...');
-                ADMIN_IDS.push(cleanUserId);
-                saveAdminIds();
-                renderAdminList();
-                return true;
-            }
-            console.log('🔍 Проверка ID:', cleanUserId, '→ ❌ Нет доступа');
-            return false;
-        }
-
-        function renderAdminList() {
-            const container = document.getElementById('adminListContainer');
-            if (!container) return;
-
-            if (ADMIN_IDS.length === 0) {
-                container.innerHTML = '<div style="color:#4a6a4a;padding:8px;">Список администраторов пуст</div>';
-                return;
-            }
-
-            let html = '';
-            ADMIN_IDS.forEach((id) => {
-                const isCurrentUser = id === userId;
-                const user = userLog.find(u => u.id === id);
-                const displayName = user ? (user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним')) : id.slice(0, 20) + '...';
-
-                html += `
-                    <div class="admin-item">
-                        <div>
-                            <span class="name">${isCurrentUser ? '⭐ ' : ''} ${displayName}</span>
-                            <div class="details">ID: ${id.slice(0, 24)}... ${isCurrentUser ? '· Вы' : ''}</div>
-                        </div>
-                        <div style="display:flex;gap:4px;">
-                            ${!isCurrentUser ? `<button onclick="removeAdminId('${id}')">Удалить</button>` : '<span style="color:#4a6a4a;font-size:12px;">(Вы)</span>'}
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function addAdminById() {
-            const input = document.getElementById('addAdminByIdInput');
-            if (!input) return;
-            const id = input.value.trim();
-
-            if (!id) {
-                alert('Введите ID пользователя!');
-                return;
-            }
-
-            if (ADMIN_IDS.includes(id)) {
-                alert('Этот ID уже в списке администраторов!');
-                return;
-            }
-
-            ADMIN_IDS.push(id);
-            saveAdminIds();
-            renderAdminList();
-            input.value = '';
-            alert('✅ ID добавлен в список администраторов!');
-            
-            // Проверяем сохранение
-            console.log('📋 Текущий список:', ADMIN_IDS);
-            console.log('📋 В localStorage:', localStorage.getItem('adminIds'));
-        }
-
-        function removeAdminId(id) {
-            const index = ADMIN_IDS.indexOf(id);
-            if (index === -1) {
-                alert('Такого ID нет в списке!');
-                return;
-            }
-            if (id === userId) {
-                if (!confirm('Вы удаляете СЕБЯ из списка администраторов! Продолжить?')) return;
-            }
-            ADMIN_IDS.splice(index, 1);
-            saveAdminIds();
-            renderAdminList();
-            alert('ID удалён из списка администраторов!');
-        }
-
-        function initAdminSystem() {
-            loadAdminIds();
-            renderAdminList();
-            console.log('✅ Система админов инициализирована. Список:', ADMIN_IDS);
-        }
-
-        // ============================================
-        //  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В АДМИНКЕ
-        // ============================================
-        function switchAdminTab(tab) {
-            // Скрываем все вкладки
-            document.getElementById('tabContentAdmins').style.display = 'none';
-            document.getElementById('tabContentUsers').style.display = 'none';
-            document.getElementById('tabContentBans').style.display = 'none';
-            
-            // Сбрасываем стили кнопок
-            document.getElementById('tabAdmins').className = 'tab-btn';
-            document.getElementById('tabUsers').className = 'tab-btn';
-            document.getElementById('tabBans').className = 'tab-btn';
-            
-            // Показываем нужную вкладку и активируем кнопку
-            if (tab === 'admins') {
-                document.getElementById('tabContentAdmins').style.display = 'block';
-                document.getElementById('tabAdmins').className = 'tab-btn active';
-                renderAdminList();
-            } else if (tab === 'users') {
-                document.getElementById('tabContentUsers').style.display = 'block';
-                document.getElementById('tabUsers').className = 'tab-btn active';
-                renderUserLog();
-            } else if (tab === 'bans') {
-                document.getElementById('tabContentBans').style.display = 'block';
-                document.getElementById('tabBans').className = 'tab-btn active';
-                renderBannedList();
-            }
-        }
-
-        // ============================================
-        //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ
-        // ============================================
-        const SECRET_KEY = 'nyuhach2026';
-        const urlParams = new URLSearchParams(window.location.search);
-        const adminKey = urlParams.get('admin');
-
-        function checkAdminAccess() {
-            if (sessionStorage.getItem('adminAuthorized') !== 'true') {
-                const password = prompt('Введите пароль для доступа к админ-панели:');
-                if (!password) return false;
-                if (password !== 'admin123') {
-                    alert('Неверный пароль!');
-                    return false;
-                }
-                sessionStorage.setItem('adminAuthorized', 'true');
-            }
-            if (!isUserAdmin()) {
-                alert('У вас нет доступа к админ-панели!');
-                sessionStorage.removeItem('adminAuthorized');
-                return false;
-            }
-            return true;
-        }
-
-        if (adminKey === SECRET_KEY) {
-            console.log('🔑 Обнаружен секретный ключ в URL');
-            if (sessionStorage.getItem('adminAuthorized') === 'true') {
-                if (!isUserAdmin()) {
-                    alert('У вас нет доступа к админ-панели!');
-                    sessionStorage.removeItem('adminAuthorized');
-                    history.replaceState(null, '', window.location.pathname);
-                } else {
-                    showAdminButton();
-                    setTimeout(() => {
-                        document.querySelector('.nav-link[data-page="admin"]')?.click();
-                    }, 300);
-                }
-            } else {
-                const password = prompt('Введите пароль для доступа к админ-панели:');
-                if (password === 'admin123') {
-                    sessionStorage.setItem('adminAuthorized', 'true');
-                    if (!isUserAdmin()) {
-                        alert('У вас нет доступа к админ-панели!');
-                        sessionStorage.removeItem('adminAuthorized');
-                        history.replaceState(null, '', window.location.pathname);
-                    } else {
-                        showAdminButton();
-                        setTimeout(() => {
-                            document.querySelector('.nav-link[data-page="admin"]')?.click();
-                        }, 300);
-                        history.replaceState(null, '', window.location.pathname);
-                    }
-                } else if (password !== null) {
-                    alert('Неверный пароль!');
-                    history.replaceState(null, '', window.location.pathname);
-                } else {
-                    history.replaceState(null, '', window.location.pathname);
-                }
-            }
+            return userId === MY_ID;
         }
 
         function showAdminButton() {
-            if (!checkAdminAccess()) return;
+            if (!isUserAdmin()) return;
 
             const navMenu = document.getElementById('navMenu');
             if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
@@ -2461,7 +2010,6 @@
                 navMenu.appendChild(adminBtn);
 
                 adminBtn.addEventListener('click', function() {
-                    if (!checkAdminAccess()) return;
                     navLinks.forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
                     const page = 'admin';
@@ -2475,14 +2023,72 @@
                         pages[page].classList.add('active');
                         pages[page].style.display = 'block';
                     }
-                    document.getElementById('userIdDisplay').textContent = userId;
-                    renderAdminList();
-                    renderBannedList();
-                    renderUserLog();
+                    document.getElementById('adminUserIdDisplay').textContent = userId;
+                    document.getElementById('adminUserIdDisplay2').textContent = userId;
+                    renderBannedListSimple();
                 });
             }
         }
 
+        // ============================================
+        //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ
+        // ============================================
+
+        const SECRET_KEY = 'nyuhach2026';
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminKey = urlParams.get('admin');
+
+        function checkAdminAccess() {
+            if (!isUserAdmin()) {
+                alert('У вас нет доступа к админ-панели!');
+                return false;
+            }
+            
+            if (sessionStorage.getItem('adminAuthorized') === 'true') {
+                return true;
+            }
+
+            const password = prompt('Введите пароль для доступа к админ-панели:');
+            if (!password) return false;
+            if (password === 'admin123') {
+                sessionStorage.setItem('adminAuthorized', 'true');
+                return true;
+            } else {
+                alert('Неверный пароль!');
+                return false;
+            }
+        }
+
+        if (adminKey === SECRET_KEY) {
+            if (!isUserAdmin()) {
+                alert('У вас нет доступа к админ-панели!');
+                history.replaceState(null, '', window.location.pathname);
+            } else {
+                if (sessionStorage.getItem('adminAuthorized') === 'true') {
+                    showAdminButton();
+                    setTimeout(() => {
+                        document.querySelector('.nav-link[data-page="admin"]')?.click();
+                    }, 300);
+                } else {
+                    const password = prompt('Введите пароль для доступа к админ-панели:');
+                    if (password === 'admin123') {
+                        sessionStorage.setItem('adminAuthorized', 'true');
+                        showAdminButton();
+                        setTimeout(() => {
+                            document.querySelector('.nav-link[data-page="admin"]')?.click();
+                        }, 300);
+                        history.replaceState(null, '', window.location.pathname);
+                    } else if (password !== null) {
+                        alert('Неверный пароль!');
+                        history.replaceState(null, '', window.location.pathname);
+                    } else {
+                        history.replaceState(null, '', window.location.pathname);
+                    }
+                }
+            }
+        }
+
+        // Скрыть админку: Ctrl+Shift+H
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
                 e.preventDefault();
@@ -2606,6 +2212,7 @@
             orderContent.style.display = 'block';
         });
 
+        // ★★★ ОТПРАВКА ЗАЯВКИ С ПРОВЕРКОЙ БАНА ★★★
         submitApplicationBtn.addEventListener('click', async function() {
             const nick = document.getElementById('playerNick').value.trim();
             const discord = document.getElementById('playerDiscord').value.trim();
@@ -2617,9 +2224,11 @@
                 return;
             }
 
+            // ★★★ ПРОВЕРКА БАНА ★★★
             if (isUserBanned()) {
-                alert('ВАС ЗАБЛОКИРОВАЛИ!\n\nВы не можете оформлять заказы.');
-                return;
+                alert('✅ Заявка успешно отправлена!');
+                closeModal();
+                return; // ← Заявка НЕ отправляется в Discord
             }
 
             const embed = {
@@ -2645,17 +2254,17 @@
                 });
 
                 if (response.ok) {
-                    alert('Заявка успешно отправлена!');
+                    alert('✅ Заявка успешно отправлена!');
                     if (isCartOrder) {
                         clearCart();
                         renderCart();
                     }
                     closeModal();
                 } else {
-                    alert('Ошибка отправки. Попробуйте ещё раз.');
+                    alert('❌ Ошибка отправки. Попробуйте ещё раз.');
                 }
             } catch (error) {
-                alert('Ошибка соединения. Проверьте интернет.');
+                alert('❌ Ошибка соединения. Проверьте интернет.');
                 console.error('Ошибка:', error);
             }
         });
@@ -2692,20 +2301,21 @@
         // ============================================
         //  ЗАГРУЗКА
         // ============================================
-        initAdminSystem();
         filterItems('all');
         updateCartUI();
 
-        document.getElementById('userIdDisplay').textContent = userId;
-        document.getElementById('userIdDisplay2').textContent = userId;
+        document.getElementById('adminUserIdDisplay').textContent = userId;
+        document.getElementById('adminUserIdDisplay2').textContent = userId;
+        renderBannedListSimple();
 
         console.log('✅ Сайт готов!');
         console.log('🔑 Секретная ссылка для входа в админ-панель:');
         console.log(window.location.origin + window.location.pathname + '?admin=' + SECRET_KEY);
         console.log('🔐 Пароль: admin123');
-        console.log('📋 Список администраторов по ID:', ADMIN_IDS);
         console.log('🆔 Ваш ID:', userId);
+        console.log('🚫 Заблокированные ID:', BANNED_IDS);
         console.log('🔒 Скрыть админку: Ctrl+Shift+H');
     </script>
+
 </body>
 </html>

@@ -2087,6 +2087,92 @@ document.addEventListener('DOMContentLoaded', function() {
 
 console.log('✅ Система бана (fingerprint + Discord) загружена!');
 console.log('🔑 Ваш ID:', userId);
+        // ============================================
+//  СКРЫТАЯ АДМИН-ПАНЕЛЬ (комбинированный способ)
+// ============================================
+
+// Функция показа кнопки админки
+function showAdminButton() {
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
+        const adminBtn = document.createElement('button');
+        adminBtn.className = 'nav-link';
+        adminBtn.dataset.page = 'admin';
+        adminBtn.textContent = '⚙️ Админ';
+        adminBtn.style.color = '#ff6a6a';
+        navMenu.appendChild(adminBtn);
+        
+        adminBtn.addEventListener('click', function() {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            showAdminPanel();
+        });
+    }
+}
+
+// 1. ДВОЙНОЙ КЛИК ПО ЗАГОЛОВКУ
+const siteTitle = document.querySelector('.header-top h1');
+if (siteTitle) {
+    let clickCount = 0;
+    let clickTimer = null;
+    siteTitle.addEventListener('click', function() {
+        clickCount++;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+        if (clickCount >= 2) {
+            clickCount = 0;
+            clearTimeout(clickTimer);
+            showAdminButton();
+            document.querySelector('.nav-link[data-page="admin"]')?.click();
+        }
+    });
+    siteTitle.title = 'Двойной клик — админ-панель';
+    siteTitle.style.cursor = 'pointer';
+}
+
+// 2. СЕКРЕТНАЯ ССЫЛКА (?admin=nyuhach2026)
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('admin') === 'nyuhach2026') {
+    setTimeout(() => {
+        showAdminButton();
+        document.querySelector('.nav-link[data-page="admin"]')?.click();
+    }, 500);
+}
+
+// 3. КОМБИНАЦИЯ КЛАВИШ (Ctrl+Shift+A)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        showAdminButton();
+        document.querySelector('.nav-link[data-page="admin"]')?.click();
+    }
+});
+
+// 4. СКРЫТЬ АДМИН-ПАНЕЛЬ (Ctrl+Shift+H)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
+        e.preventDefault();
+        const adminBtn = document.querySelector('.nav-link[data-page="admin"]');
+        if (adminBtn) {
+            adminBtn.remove();
+        }
+        const adminPanel = document.getElementById('adminPanel');
+        if (adminPanel) {
+            adminPanel.style.display = 'none';
+            adminPanel.classList.remove('active');
+        }
+        // Возвращаемся на главную
+        document.querySelector('.nav-link[data-page="info"]')?.click();
+        alert('🔒 Админ-панель скрыта');
+    }
+});
+
+console.log('🕵️ Админ-панель скрыта!');
+console.log('🔑 Способы открытия:');
+console.log('  • Двойной клик по названию сайта');
+console.log('  • Ссылка: ?admin=nyuhach2026');
+console.log('  • Клавиши: Ctrl+Shift+A');
+console.log('🔒 Скрыть: Ctrl+Shift+H');
     </script>
 
 </body>

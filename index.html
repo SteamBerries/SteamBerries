@@ -2229,7 +2229,7 @@
         // ★★★ СПИСОК АДМИНОВ ПО ID ★★★
         let ADMIN_IDS = [];
 
-        // Загрузка из localStorage
+        // Загрузка из localStorage (вызывается ПЕРВОЙ при загрузке)
         function loadAdminIds() {
             const stored = localStorage.getItem('adminIds');
             if (stored) {
@@ -2237,6 +2237,7 @@
                     const parsed = JSON.parse(stored);
                     if (Array.isArray(parsed)) {
                         ADMIN_IDS = parsed;
+                        console.log('📋 Загружен список админов:', ADMIN_IDS);
                         return;
                     }
                 } catch (e) {
@@ -2246,6 +2247,7 @@
             // Если списка нет — создаём с твоим ID
             ADMIN_IDS = ['fp_p1ktud_ufmt', 'fp_p1ktud_1oec'];
             saveAdminIds();
+            console.log('📋 Создан новый список админов:', ADMIN_IDS);
         }
 
         function saveAdminIds() {
@@ -2253,7 +2255,9 @@
         }
 
         function isUserAdmin() {
-            return ADMIN_IDS.includes(userId);
+            const result = ADMIN_IDS.includes(userId);
+            console.log('🔍 Проверка ID:', userId, '→', result ? '✅ есть в списке' : '❌ нет в списке');
+            return result;
         }
 
         // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА ★★★
@@ -2357,6 +2361,7 @@
 
         // Если в URL есть секретный ключ — пробуем открыть админку
         if (adminKey === SECRET_KEY) {
+            console.log('🔑 Обнаружен секретный ключ в URL');
             // Сначала запрашиваем пароль
             if (sessionStorage.getItem('adminAuthorized') === 'true') {
                 // Уже авторизован — проверяем ID
@@ -2654,20 +2659,22 @@
         // ============================================
         //  ЗАГРУЗКА
         // ============================================
+        // ★★★ СНАЧАЛА ЗАГРУЖАЕМ СПИСОК АДМИНОВ ★★★
         loadAdminIds();
+
         filterItems('all');
         updateCartUI();
 
         document.getElementById('userIdDisplay').textContent = userId;
         document.getElementById('userIdDisplay2').textContent = userId;
 
-        console.log('Сайт готов!');
-        console.log('Секретная ссылка для входа в админ-панель:');
+        console.log('✅ Сайт готов!');
+        console.log('🔑 Секретная ссылка для входа в админ-панель:');
         console.log(window.location.origin + window.location.pathname + '?admin=' + SECRET_KEY);
-        console.log('Пароль: admin123');
-        console.log('Список администраторов по ID:', ADMIN_IDS);
-        console.log('Скрыть админку: Ctrl+Shift+H');
-        console.log('Ваш ID:', userId);
+        console.log('🔐 Пароль: admin123');
+        console.log('📋 Список администраторов по ID:', ADMIN_IDS);
+        console.log('🆔 Ваш ID:', userId);
+        console.log('🔒 Скрыть админку: Ctrl+Shift+H');
     </script>
 
 </body>

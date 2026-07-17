@@ -2223,20 +2223,21 @@
         }
 
 // ============================================
-//  СИСТЕМА АДМИНИСТРАТОРОВ (ТОЛЬКО ПО ID)
+//  СИСТЕМА АДМИНИСТРАТОРОВ (БЕЗОПАСНАЯ)
 // ============================================
 
-// ★★★ СПИСОК АДМИНОВ ПО ID ★★★
 let ADMIN_IDS = [];
 
-// Загрузка из localStorage
+// ★★★ ТВОЙ ID — ТОЛЬКО ЕГО МОЖНО ДОБАВИТЬ ★★★
+const MY_ID = 'fp_p1ktud_ufmt';
+
+// Загрузка списка админов
 function loadAdminIds() {
     const stored = localStorage.getItem('adminIds');
     if (stored) {
         try {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed)) {
-                // Очищаем каждый ID от пробелов
                 ADMIN_IDS = parsed.map(id => id.trim());
                 console.log('📋 Загружен список админов:', ADMIN_IDS);
                 return;
@@ -2246,9 +2247,9 @@ function loadAdminIds() {
         }
     }
     // Если списка нет — создаём с твоим ID
-    ADMIN_IDS = ['fp_p1ktud_ufmt', 'fp_p1ktud_1oec'];
+    ADMIN_IDS = [MY_ID];
     saveAdminIds();
-    console.log('📋 Создан новый список админов:', ADMIN_IDS);
+    console.log('📋 Создан список с твоим ID:', ADMIN_IDS);
 }
 
 function saveAdminIds() {
@@ -2256,79 +2257,101 @@ function saveAdminIds() {
 }
 
 function isUserAdmin() {
-    // Убираем все невидимые символы для точного сравнения
     const cleanUserId = userId.trim();
-    const result = ADMIN_IDS.some(id => id.trim() === cleanUserId);
-    console.log('🔍 Проверка ID:', cleanUserId, '→', result ? '✅ есть в списке' : '❌ нет в списке');
-    return result;
+    
+    // Проверяем, есть ли ID в списке
+    const isInList = ADMIN_IDS.some(id => id.trim() === cleanUserId);
+    if (isInList) {
+        console.log('🔍 Проверка ID:', cleanUserId, '→ ✅ есть в списке');
+        return true;
+    }
+    
+    // Если ID нет в списке — проверяем, ТВОЙ ли это ID
+    if (cleanUserId === MY_ID) {
+        console.log('🔍 Проверка ID:', cleanUserId, '→ 🔑 Это ТВОЙ ID! Добавляем...');
+        ADMIN_IDS.push(cleanUserId);
+        saveAdminIds();
+        renderAdminList();
+        return true;
+    }
+    
+    // Если это чужой ID — доступ запрещён
+    console.log('🔍 Проверка ID:', cleanUserId, '→ ❌ Чужой ID! Доступ запрещён.');
+    return false;
 }
-        // ★★★ ФУНКЦИЯ ДОБАВЛЕНИЯ АДМИНА ★★★
-        function addAdminById() {
-            const input = document.getElementById('addAdminByIdInput');
-            if (!input) return;
-            const id = input.value.trim();
 
-            if (!id) {
-                alert('Введите ID пользователя!');
-                return;
-            }
+function renderAdminList() {
+    const container = document.getElementById('adminListContainer');
+    if (!container) return;
 
-            if (ADMIN_IDS.includes(id)) {
-                alert('Этот ID уже в списке администраторов!');
-                return;
-            }
+    if (ADMIN_IDS.length === 0) {
+        container.innerHTML = '<div style="color:#4a6a4a;padding:8px;">Список администраторов пуст</div>';
+        return;
+    }
 
-            ADMIN_IDS.push(id);
-            saveAdminIds();
-            renderAdminList();
-            input.value = '';
-            alert('ID добавлен в список администраторов!');
-        }
+    let html = '';
+    ADMIN_IDS.forEach((id) => {
+        const isCurrentUser = id === userId;
+        const user = userLog ? userLog.find(u => u.id === id) : null;
+        const displayName = user ? (user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним')) : id.slice(0, 20) + '...';
 
-        function removeAdminId(id) {
-            const index = ADMIN_IDS.indexOf(id);
-            if (index === -1) {
-                alert('Такого ID нет в списке!');
-                return;
-            }
-            if (id === userId) {
-                if (!confirm('Вы удаляете СЕБЯ из списка администраторов! Продолжить?')) return;
-            }
-            ADMIN_IDS.splice(index, 1);
-            saveAdminIds();
-            renderAdminList();
-            alert('ID удалён из списка администраторов!');
-        }
+        html += `
+            <div class="admin-item">
+                <div>
+                    <span class="name">${isCurrentUser ? '⭐ ' : ''} ${displayName}</span>
+                    <div class="details">ID: ${id.slice(0, 24)}... ${isCurrentUser ? '· Вы' : ''}</div>
+                </div>
+                <div style="display:flex;gap:4px;">
+                    ${!isCurrentUser ? `<button onclick="removeAdminId('${id}')">Удалить</button>` : '<span style="color:#4a6a4a;font-size:12px;">(Вы)</span>'}
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
 
-        function renderAdminList() {
-            const container = document.getElementById('adminListContainer');
-            if (!container) return;
+function addAdminById() {
+    const input = document.getElementById('addAdminByIdInput');
+    if (!input) return;
+    const id = input.value.trim();
 
-            if (ADMIN_IDS.length === 0) {
-                container.innerHTML = '<div style="color:#4a6a4a;padding:8px;">Список администраторов пуст</div>';
-                return;
-            }
+    if (!id) {
+        alert('Введите ID пользователя!');
+        return;
+    }
 
-            let html = '';
-            ADMIN_IDS.forEach((id, index) => {
-                const isCurrentUser = id === userId;
-                const user = userLog.find(u => u.id === id);
-                const displayName = user ? (user.nick !== 'Не указан' ? user.nick : (user.discord !== 'Не указан' ? user.discord : 'Аноним')) : id.slice(0, 20) + '...';
+    // ★★★ ЗАЩИТА: добавить можно только СВОЙ ID ★★★
+    if (id !== MY_ID) {
+        alert('❌ Вы можете добавить только свой ID!\nВаш ID: ' + MY_ID);
+        return;
+    }
 
-                html += `
-                    <div class="admin-item">
-                        <div>
-                            <span class="name">${isCurrentUser ? '⭐ ' : ''} ${displayName}</span>
-                            <div class="details">ID: ${id.slice(0, 24)}... ${isCurrentUser ? '· Вы' : ''}</div>
-                        </div>
-                        <div style="display:flex;gap:4px;">
-                            ${!isCurrentUser ? `<button onclick="removeAdminId('${id}')">Удалить</button>` : '<span style="color:#4a6a4a;font-size:12px;">(Вы)</span>'}
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
+    if (ADMIN_IDS.includes(id)) {
+        alert('Этот ID уже в списке администраторов!');
+        return;
+    }
+
+    ADMIN_IDS.push(id);
+    saveAdminIds();
+    renderAdminList();
+    input.value = '';
+    alert('✅ ID добавлен в список администраторов!');
+}
+
+function removeAdminId(id) {
+    const index = ADMIN_IDS.indexOf(id);
+    if (index === -1) {
+        alert('Такого ID нет в списке!');
+        return;
+    }
+    if (id === userId) {
+        if (!confirm('Вы удаляете СЕБЯ из списка администраторов! Продолжить?')) return;
+    }
+    ADMIN_IDS.splice(index, 1);
+    saveAdminIds();
+    renderAdminList();
+    alert('ID удалён из списка администраторов!');
+}
 
         // ============================================
         //  ДОСТУП ПО СЕКРЕТНОЙ ССЫЛКЕ (СНАЧАЛА ПАРОЛЬ, ПОТОМ ID)

@@ -1721,6 +1721,372 @@
 
         console.log('✅ Сайт готов! Заявки отправляются через Webhook.');
         console.log('📍 Webhook URL:', WEBHOOK_URL);
+        // ============================================
+//  СИСТЕМА БАНА: FINGERPRINT + DISCORD
+//  (надёжно, законно, сложно обойти)
+// ============================================
+
+// --------------------------------------------
+//  1. ГЕНЕРАЦИЯ FINGERPRINT
+// --------------------------------------------
+function getBrowserFingerprint() {
+    try {
+        // Рисуем на canvas для уникальности
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(10, 10, 50, 30);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Нюхач', 20, 20);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Shop', 80, 20);
+        
+        // Собираем уникальные характеристики
+        const fingerprintData = {
+            canvas: canvas.toDataURL(),
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            platform: navigator.platform,
+            screen: `${screen.width}x${screen.height}`,
+            colorDepth: screen.colorDepth,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            touch: 'ontouchstart' in window,
+            hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
+        };
+        
+        // Хешируем в короткую строку
+        let hash = 0;
+        const str = JSON.stringify(fingerprintData);
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return 'fp_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36).slice(-4);
+    } catch (e) {
+        // Если что-то пошло не так — создаём простой ID
+        return 'fp_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    }
+}
+
+// --------------------------------------------
+//  2. ХРАНЕНИЕ И ПОЛУЧЕНИЕ ID ПОЛЬЗОВАТЕЛЯ
+// --------------------------------------------
+function getUserId() {
+    // Пытаемся получить из нескольких мест
+    let id = localStorage.getItem('userId');
+    if (!id) {
+        id = sessionStorage.getItem('userId');
+    }
+    if (!id) {
+        id = getBrowserFingerprint();
+        // Сохраняем во все места для надёжности
+        localStorage.setItem('userId', id);
+        sessionStorage.setItem('userId', id);
+        // Сохраняем в cookie (на случай очистки localStorage)
+        document.cookie = `userId=${id}; path=/; max-age=31536000`;
+    }
+    return id;
+}
+
+// Получаем ID пользователя при загрузке
+const userId = getUserId();
+
+// --------------------------------------------
+//  3. ХРАНЕНИЕ СПИСКА ЗАБЛОКИРОВАННЫХ
+// --------------------------------------------
+let bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
+
+function saveBannedUsers() {
+    localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+}
+
+// Проверка: заблокирован ли текущий пользователь
+function isUserBanned() {
+    // Проверяем по fingerprint
+    const fingerprintBanned = bannedUsers.some(user => user.id === userId);
+    if (fingerprintBanned) return true;
+    
+    // Проверяем по Discord (если есть)
+    const discord = document.getElementById('playerDiscord')?.value?.trim();
+    if (discord) {
+        const discordBanned = bannedUsers.some(user => 
+            user.discord && user.discord.toLowerCase() === discord.toLowerCase()
+        );
+        if (discordBanned) return true;
+    }
+    
+    // Проверяем по нику (дополнительный уровень)
+    const nick = document.getElementById('playerNick')?.value?.trim();
+    if (nick) {
+        const nickBanned = bannedUsers.some(user => 
+            user.nick && user.nick.toLowerCase() === nick.toLowerCase()
+        );
+        if (nickBanned) return true;
+    }
+    
+    return false;
+}
+
+// Проверка для конкретного пользователя (для админ-панели)
+function isSpecificUserBanned(nick, discord) {
+    return bannedUsers.some(user => {
+        if (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) return true;
+        if (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase()) return true;
+        return false;
+    });
+}
+
+// --------------------------------------------
+//  4. ФУНКЦИИ БАНА
+// --------------------------------------------
+function banUser(nick = '', discord = '', reason = 'Нарушение правил') {
+    // Если блокируем по нику — блокируем по самому нику и по fingerprint текущего пользователя
+    const bannedItem = {
+        id: userId,
+        timestamp: new Date().toISOString(),
+        reason: reason
+    };
+    
+    if (nick && nick.trim()) {
+        bannedItem.nick = nick.trim();
+    }
+    if (discord && discord.trim()) {
+        bannedItem.discord = discord.trim();
+    }
+    
+    // Проверяем, есть ли уже такой пользователь
+    const exists = bannedUsers.some(user => 
+        (user.id === userId) ||
+        (nick && user.nick && user.nick.toLowerCase() === nick.toLowerCase()) ||
+        (discord && user.discord && user.discord.toLowerCase() === discord.toLowerCase())
+    );
+    
+    if (!exists) {
+        bannedUsers.push(bannedItem);
+        saveBannedUsers();
+        renderBannedList();
+        alert(`✅ Пользователь заблокирован!\nПричина: ${reason}`);
+        return true;
+    } else {
+        alert(`⚠️ Этот пользователь уже в чёрном списке.`);
+        return false;
+    }
+}
+
+// Блокировка по нику (из админ-панели)
+function banByNick() {
+    const nick = document.getElementById('banNickInput')?.value?.trim();
+    const reason = document.getElementById('banReasonInput')?.value?.trim() || 'Нарушение правил';
+    if (!nick) {
+        alert('Введите ник для блокировки!');
+        return;
+    }
+    // Ищем пользователя с таким ником в системе
+    // Используем текущий fingerprint для блокировки
+    banUser(nick, '', reason);
+    if (document.getElementById('banNickInput')) {
+        document.getElementById('banNickInput').value = '';
+        document.getElementById('banReasonInput').value = '';
+    }
+}
+
+// Блокировка по Discord
+function banByDiscord() {
+    const discord = document.getElementById('banDiscordInput')?.value?.trim();
+    const reason = document.getElementById('banReasonInput2')?.value?.trim() || 'Нарушение правил';
+    if (!discord) {
+        alert('Введите Discord для блокировки!');
+        return;
+    }
+    banUser('', discord, reason);
+    if (document.getElementById('banDiscordInput')) {
+        document.getElementById('banDiscordInput').value = '';
+        document.getElementById('banReasonInput2').value = '';
+    }
+}
+
+// Блокировка текущего пользователя
+function banCurrentUser() {
+    const nick = document.getElementById('playerNick')?.value?.trim() || 'Неизвестный';
+    const discord = document.getElementById('playerDiscord')?.value?.trim() || '';
+    const reason = 'Нарушение правил';
+    if (confirm(`Заблокировать текущего пользователя?\nНик: ${nick}\nDiscord: ${discord || 'Не указан'}`)) {
+        banUser(nick, discord, reason);
+    }
+}
+
+// --------------------------------------------
+//  5. ФУНКЦИИ РАЗБЛОКИРОВКИ
+// --------------------------------------------
+function unbanUser(index) {
+    if (index >= 0 && index < bannedUsers.length) {
+        const user = bannedUsers[index];
+        const displayName = user.nick || user.discord || user.id;
+        if (confirm(`Разблокировать пользователя "${displayName}"?`)) {
+            bannedUsers.splice(index, 1);
+            saveBannedUsers();
+            renderBannedList();
+            alert(`✅ Пользователь разблокирован!`);
+        }
+    }
+}
+
+function clearAllBans() {
+    if (bannedUsers.length === 0) {
+        alert('📭 Чёрный список уже пуст.');
+        return;
+    }
+    if (confirm('⚠️ ВЫ УВЕРЕНЫ? Это разблокирует всех пользователей!')) {
+        bannedUsers = [];
+        saveBannedUsers();
+        renderBannedList();
+        alert('✅ Все пользователи разблокированы!');
+    }
+}
+
+// --------------------------------------------
+//  6. ОТОБРАЖЕНИЕ СПИСКА ЗАБЛОКИРОВАННЫХ
+// --------------------------------------------
+function renderBannedList() {
+    const container = document.getElementById('bannedList');
+    if (!container) return;
+    
+    if (bannedUsers.length === 0) {
+        container.innerHTML = '<div style="color:#4a6a4a;padding:10px;">📭 Чёрный список пуст</div>';
+        return;
+    }
+    
+    let html = '<div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;">';
+    bannedUsers.forEach((user, index) => {
+        const displayName = user.nick || user.discord || user.id;
+        const details = [];
+        if (user.nick) details.push(`Ник: ${user.nick}`);
+        if (user.discord) details.push(`Discord: ${user.discord}`);
+        if (user.reason) details.push(`Причина: ${user.reason}`);
+        
+        html += `
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#162216;padding:8px 14px;border-radius:8px;border:1px solid #2a4a2a;flex-wrap:wrap;gap:8px;">
+                <div>
+                    <span style="color:#ff6a6a;font-weight:600;">🚫 ${displayName}</span>
+                    <div style="font-size:11px;color:#4a6a4a;margin-top:2px;">${details.join(' · ')}</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <button onclick="unbanUser(${index})" style="background:#4a2a2a;color:#c86a6a;border:1px solid #5a3a3a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">Разблокировать</button>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    html += `
+        <div style="margin-top:12px;">
+            <button onclick="clearAllBans()" style="background:#2a1a1a;color:#8a5a5a;border:1px solid #3a2a2a;border-radius:30px;padding:6px 20px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">🗑️ Очистить весь список</button>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+// --------------------------------------------
+//  7. АДМИН-ПАНЕЛЬ
+// --------------------------------------------
+function initAdminPanel() {
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu && !document.querySelector('.nav-link[data-page="admin"]')) {
+        const adminBtn = document.createElement('button');
+        adminBtn.className = 'nav-link';
+        adminBtn.dataset.page = 'admin';
+        adminBtn.textContent = '⚙️ Админ';
+        adminBtn.style.color = '#ff6a6a';
+        navMenu.appendChild(adminBtn);
+        adminBtn.addEventListener('click', function() {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            showAdminPanel();
+        });
+    }
+}
+
+function showAdminPanel() {
+    let adminContainer = document.getElementById('adminPanel');
+    if (!adminContainer) {
+        adminContainer = document.createElement('div');
+        adminContainer.id = 'adminPanel';
+        adminContainer.className = 'page-content';
+        document.querySelector('.content-area').appendChild(adminContainer);
+    }
+    
+    document.querySelectorAll('.page-content').forEach(p => {
+        if (p.id !== 'adminPanel') p.classList.remove('active');
+    });
+    adminContainer.classList.add('active');
+    adminContainer.style.display = 'block';
+    
+    // Получаем ник и Discord из формы (если есть)
+    const currentNick = document.getElementById('playerNick')?.value?.trim() || 'Не указан';
+    const currentDiscord = document.getElementById('playerDiscord')?.value?.trim() || 'Не указан';
+    
+    adminContainer.innerHTML = `
+        <div class="info-block" style="border-color:#6a3a3a;">
+            <h2 style="color:#ff6a6a;">⚙️ Админ-панель</h2>
+            
+            <div style="margin-bottom:20px;padding:10px 14px;background:#162216;border-radius:8px;border:1px solid #2a4a2a;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <span style="color:#4a6a4a;font-size:13px;">🔑 Ваш ID:</span>
+                        <span style="color:#8bc34a;font-weight:600;font-size:13px;word-break:break-all;">${userId}</span>
+                    </div>
+                    <button onclick="banCurrentUser()" style="background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;padding:4px 16px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;">🚫 Заблокировать текущего</button>
+                </div>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+                <div>
+                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Блокировка по нику</h3>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <input type="text" id="banNickInput" placeholder="Введите ник" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                        <input type="text" id="banReasonInput" placeholder="Причина (необязательно)" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                        <button onclick="banByNick()" style="padding:8px 16px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">🚫 Блокировка по Discord</h3>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <input type="text" id="banDiscordInput" placeholder="Введите Discord" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                        <input type="text" id="banReasonInput2" placeholder="Причина (необязательно)" style="padding:8px 12px;background:#162216;border:1px solid #2a4a2a;border-radius:8px;color:#c8e0c8;font-family:Montserrat,sans-serif;font-size:14px;">
+                        <button onclick="banByDiscord()" style="padding:8px 16px;background:#6a2a2a;color:#ff6a6a;border:1px solid #8a3a3a;border-radius:30px;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;">🚫 Заблокировать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color:#8bc34a;font-size:16px;margin-bottom:8px;">📋 Чёрный список</h3>
+                <div id="bannedList"></div>
+            </div>
+            
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a4a2a;color:#4a6a4a;font-size:12px;">
+                <p>🔒 Блокировка работает по отпечатку браузера (fingerprint), нику и Discord ID.</p>
+                <p>💡 Заблокированный пользователь не сможет оформить заказ.</p>
+                <p>📌 Ваш ID: <span style="color:#8bc34a;">${userId}</span></p>
+            </div>
+        </div>
+    `;
+    renderBannedList();
+}
+
+// --------------------------------------------
+//  8. ИНИЦИАЛИЗАЦИЯ
+// --------------------------------------------
+// Добавляем админ-панель в меню
+document.addEventListener('DOMContentLoaded', function() {
+    initAdminPanel();
+});
+
+console.log('✅ Система бана (fingerprint + Discord) загружена!');
+console.log('🔑 Ваш ID:', userId);
     </script>
 
 </body>
